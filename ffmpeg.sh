@@ -123,12 +123,14 @@ image_to_webp() {
         return 0
     fi
 
+    shopt -s nullglob
     for file in *.png *.jpg; do
         ffmpeg_no_banner -i "$file" "$output_path1/${file%.*}.webp"
     done
     for file in *.gif; do
         ffmpeg_no_banner -i "$file" "$output_path1/${file%.*}.webp"
     done
+    shopt -u nullglob
 
     finished_work "$output_path1"
 }
