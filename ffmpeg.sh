@@ -47,8 +47,8 @@ finished_work() {
 
 image_add_watermark() {
     local description="给图片添加版权水印并压缩"
-    local output_path1="for_web"
-    local output_path2="for_general"
+    local output_path1="image_for_web"
+    local output_path2="image_for_general"
     preparational_work "$description" "$output_path1" "$output_path2"
     if [ $? -eq 10 ]; then
         return 0
@@ -74,8 +74,8 @@ image_add_watermark() {
 
 image_sequence_to_video_with_gpu() {
     local description="显卡加速将图片序列合成为视频"
-    local output_path1="output"
-    preparational_work "$description" "$output_path1"
+    local output_path="output_video"
+    preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
     fi
@@ -107,38 +107,38 @@ image_sequence_to_video_with_gpu() {
     fi
     png_count=$(ls -1 *.png 2>/dev/null | wc -l)
     if [ $png_count -gt 0 ]; then
-        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -r 24 -f image2 -i %0"$name_length"d.png -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "output/output.mp4"
+        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -r 24 -f image2 -i %0"$name_length"d.png -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "$output_path/output.mp4"
     else
-        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -c:v mjpeg_cuvid -r 24 -f image2 -i %0"$name_length"d.jpg -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "output/output.mp4"
+        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -c:v mjpeg_cuvid -r 24 -f image2 -i %0"$name_length"d.jpg -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "$output_path/output.mp4"
     fi
 
-    finished_work "$output_path1"
+    finished_work "$output_path"
 }
 
 image_to_webp() {
     local description="压缩图片，全部转为webp格式"
-    local output_path1="output"
-    preparational_work "$description" "$output_path1"
+    local output_path="compress_image"
+    preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
     fi
 
     shopt -s nullglob
     for file in *.png *.jpg; do
-        ffmpeg_no_banner -i "$file" "$output_path1/${file%.*}.webp"
+        ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.webp"
     done
     for file in *.gif; do
-        ffmpeg_no_banner -i "$file" "$output_path1/${file%.*}.webp"
+        ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.webp"
     done
     shopt -u nullglob
 
-    finished_work "$output_path1"
+    finished_work "$output_path"
 }
 
 merge_mp4_audio() {
     local description="合并视频和音频：mp4+m4a/mp3"
-    local output_path1="output"
-    preparational_work "$description" "$output_path1"
+    local output_path="output_video"
+    preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
     fi
@@ -150,9 +150,9 @@ merge_mp4_audio() {
     else
         audio_file=$(ls *.mp3 2>/dev/null)
     fi
-    ffmpeg_no_banner -i "$mp4_file" -i "$audio_file" -c copy "output/$mp4_file"
+    ffmpeg_no_banner -i "$mp4_file" -i "$audio_file" -c copy "$output_path/$mp4_file"
 
-    finished_work "$output_path1"
+    finished_work "$output_path"
 }
 
 flv_to_mp4() {
@@ -183,18 +183,18 @@ video_to_hevc() {
     done
     shopt -u nullglob
 
-    finished_work
+    finished_work "$output_path"
 }
 
 test() {
     local description="测试"
-    local output_path1="output"
-    preparational_work "$description" "$output_path1"
+    local output_path="output"
+    preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
     fi
 
-    finished_work
+    finished_work "$output_path"
 }
 
 while true; do
