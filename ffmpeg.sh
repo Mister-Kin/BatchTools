@@ -169,6 +169,23 @@ flv_to_mp4() {
     finished_work
 }
 
+video_to_hevc() {
+    local description="压缩视频，全部转为hevc编码的mp4格式（libx265）"
+    local output_path="compress_video"
+    preparational_work "$description" "$output_path"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    shopt -s nullglob
+    for file in *.mp4 *.flv *.mov; do
+        ffmpeg_no_banner -i "$file" -c:v libx265 -c:a copy "$output_path/${file%.*}.mp4"
+    done
+    shopt -u nullglob
+
+    finished_work
+}
+
 test() {
     local description="测试"
     local output_path1="output"
@@ -182,12 +199,16 @@ test() {
 
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "合并视频和音频：mp4+m4a/mp3" "flv格式转mp4格式" "退出程序" "测试")
+    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "合并视频和音频：mp4+m4a/mp3" "flv格式转mp4格式" "退出程序" "测试")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
         "测试")
             test
+            break
+            ;;
+        "压缩视频，全部转为hevc编码的mp4格式（libx265）")
+            video_to_hevc
             break
             ;;
         "flv格式转mp4格式")
