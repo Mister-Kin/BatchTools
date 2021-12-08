@@ -136,7 +136,7 @@ image_to_webp() {
 }
 
 merge_mp4_audio() {
-    local description="合并视频和音频：mp4 + m4a/mp3"
+    local description="合并视频和音频：mp4+m4a/mp3"
     local output_path1="output"
     preparational_work "$description" "$output_path1"
     if [ $? -eq 10 ]; then
@@ -182,7 +182,7 @@ test() {
 
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "合并视频和音频：mp4 + m4a/mp3" "flv格式转mp4格式" "退出程序" "测试")
+    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "合并视频和音频：mp4+m4a/mp3" "flv格式转mp4格式" "退出程序" "测试")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
@@ -194,7 +194,7 @@ while true; do
             flv_to_mp4
             break
             ;;
-        "合并视频和音频：mp4 + m4a/mp3")
+        "合并视频和音频：mp4+m4a/mp3")
             merge_mp4_audio
             break
             ;;
