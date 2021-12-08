@@ -155,6 +155,20 @@ merge_mp4_audio() {
     finished_work "$output_path1"
 }
 
+flv_to_mp4() {
+    local description="flv格式转mp4格式"
+    preparational_work "$description"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    for file in *.flv; do
+        ffmpeg_no_banner -i "$file" -c copy "${file%.*}.mp4"
+    done
+
+    finished_work
+}
+
 test() {
     local description="测试"
     local output_path1="output"
@@ -168,12 +182,16 @@ test() {
 
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "合并视频和音频：mp4 + m4a/mp3" "退出程序" "测试")
+    options=("给图片添加版权水印并压缩" "显卡加速将图片序列合成为视频" "压缩图片，全部转为webp格式" "合并视频和音频：mp4 + m4a/mp3" "flv格式转mp4格式" "退出程序" "测试")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
         "测试")
             test
+            break
+            ;;
+        "flv格式转mp4格式")
+            flv_to_mp4
             break
             ;;
         "合并视频和音频：mp4 + m4a/mp3")
