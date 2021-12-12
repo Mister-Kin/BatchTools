@@ -56,7 +56,7 @@ image_add_watermark() {
 
     local copyright_text="© Mr. Kin"
     local font_path="C\:\/Windows\/fonts\/SourceSans3-Semibold.otf"
-    local filter_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=35:bordercolor=black:borderw=1:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=20:y=20 [toplayer]; [main][toplayer] overlay"
+    local filter_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=50:bordercolor=black:borderw=1:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
     local filter_effect_for_gif="$filter_effect, split[main][tmp]; [tmp]palettegen[palette]; [main][palette]paletteuse"
     shopt -s nullglob
     for file in *.png *.jpg; do
