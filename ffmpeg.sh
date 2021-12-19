@@ -59,7 +59,7 @@ file_count() {
     echo "$file_count"
 }
 
-text_watermark() {
+copyright_watermark() {
     local copyright_text="© Mr. Kin"
     local font_path="C\:\/Windows\/fonts\/SourceSans3-Semibold.otf"
     local watermark_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=50:bordercolor=black:borderw=1:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
@@ -76,7 +76,7 @@ image_add_watermark() {
     fi
 
     local filter_effect
-    filter_effect=$(text_watermark)
+    filter_effect=$(copyright_watermark)
     local filter_effect_for_gif="$filter_effect, split[main][tmp]; [tmp]palettegen[palette]; [main][palette]paletteuse"
     shopt -s nullglob
     for file in *.png *.jpg; do
@@ -137,7 +137,7 @@ image_sequence_to_video_with_gpu() {
 }
 
 make_video_with_libx264() {
-    local description="生成avc编码的mp4视频（libx264）"
+    local description="生成avc编码的mp4格式视频（libx264）"
     local output_path="output_video"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
@@ -186,7 +186,7 @@ make_video_with_libx264() {
 
     local watermark_flag
     echo "提示：不输入（等待10s）或直接回车，则默认添加文字水印，若不需要请输入n。"
-    if read -t 10 -r -p "是否添加文字水印（默认y）：" watermark_flag; then
+    if read -t 10 -r -p "是否添加版权水印（默认y）：" watermark_flag; then
         if [ "$watermark_flag" = "" ]; then
             watermark_flag="y"
         fi
@@ -195,7 +195,7 @@ make_video_with_libx264() {
     fi
 
     local watermark_effect filter_effect
-    watermark_effect=$(text_watermark)
+    watermark_effect=$(copyright_watermark)
     if [ "$watermark_flag" = "y" ]; then
         filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=pix_fmts=yuv420p"
     else
@@ -294,11 +294,11 @@ video_to_hevc() {
 
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
-        "生成avc编码的mp4视频（libx264）")
+        "生成avc编码的mp4格式视频（libx264）")
             make_video_with_libx264
             break
             ;;
