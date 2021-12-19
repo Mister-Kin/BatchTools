@@ -245,6 +245,7 @@ merge_mp4_audio() {
 
     local audio_file m4a_count
     m4a_count=$(file_count "m4a")
+
     shopt -s nullglob
     local mp4_file=(*.mp4)
     if [ "$m4a_count" -gt 0 ]; then
@@ -301,8 +302,34 @@ retrieve_audio_album() {
     fi
 
     shopt -s nullglob
-    for file in *.mp3 *.m4a *.flac *.wav; do
+    for file in *.mp3 *.m4a *.flac; do
         ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/${file%.*}.png"
+    done
+    shopt -u nullglob
+
+    finished_work "$output_path"
+}
+
+attach_image_to_audio() {
+    local description="为音频添加封面图"
+    local output_path="output_audio"
+    preparational_work "$description" "$output_path"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    local png_count image_file
+    png_count=$(file_count "png")
+
+    shopt -s nullglob
+    if [ "$png_count" -gt 0 ]; then
+        image_file=(*.png)
+    else
+        image_file=(*.jpg)
+    fi
+
+    for file in *.mp3 *.m4a *.flac; do
+        ffmpeg_no_banner -i "$file" -i "${image_file[0]}" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
     done
     shopt -u nullglob
 
@@ -311,10 +338,14 @@ retrieve_audio_album() {
 
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "为音频添加封面图" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
+        "为音频添加封面图")
+            attach_image_to_audio
+            break
+            ;;
         "获取音频封面图")
             retrieve_audio_album
             break
