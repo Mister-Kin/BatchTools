@@ -13,8 +13,14 @@ preparational_work() {
     if [ "$path" = "0" ]; then
         return 10
     fi
-    cd "$path" || return
-    echo "已切换到路径$path"
+    if cd "$path" 2>/dev/null; then
+        echo "已切换到路径$path"
+    else
+        while ! cd "$path" 2>/dev/null; do
+            read -r -p "当前输入路径不存在，请重新输入路径并回车：" path
+        done
+        echo "已切换到路径$path"
+    fi
     if [ $# -gt 1 ]; then
         if [ -d "$path/$2" ]; then
             rm -rf "$2"
