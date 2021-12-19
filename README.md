@@ -6,11 +6,12 @@ Some batch scripts for easily doing work.
 ## Features
 - ffmpeg.sh
   - 给图片添加版权水印并压缩
-  - 显卡加速将图片序列合成为视频
   - 合并视频和音频：mp4+m4a/mp3
+  - 生成avc编码的mp4格式视频（libx264）
   - 压缩图片，全部转为webp格式
   - 压缩视频，全部转为hevc编码的mp4格式（libx265）
   - flv格式转mp4格式
+  - 显卡加速将图片序列合成为视频（不再维护该功能）
 
 ## Usage
 Just run the script file in terminal and follow the hint.
