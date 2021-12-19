@@ -197,9 +197,9 @@ make_video_with_libx264() {
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)
     if [ "$watermark_flag" = "y" ]; then
-        filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=pix_fmts=yuv420p"
+        filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
     else
-        filter_effect="format=pix_fmts=yuv420p"
+        filter_effect="format=yuv420p"
     fi
 
     if [ "$png_count" -gt 0 ] || [ "$jpg_count" -gt 0 ]; then
