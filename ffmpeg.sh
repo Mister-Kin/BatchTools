@@ -292,12 +292,33 @@ video_to_hevc() {
     finished_work "$output_path"
 }
 
+retrieve_audio_album() {
+    local description="获取音频封面图"
+    local output_path="audio_album"
+    preparational_work "$description" "$output_path"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    shopt -s nullglob
+    for file in *.mp3 *.m4a *.flac *.wav; do
+        ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/${file%.*}.png"
+    done
+    shopt -u nullglob
+
+    finished_work "$output_path"
+}
+
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
+        "获取音频封面图")
+            retrieve_audio_album
+            break
+            ;;
         "生成avc编码的mp4格式视频（libx264）")
             make_video_with_libx264
             break
