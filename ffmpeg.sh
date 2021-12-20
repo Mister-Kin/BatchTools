@@ -138,7 +138,7 @@ image_sequence_to_video_with_gpu() {
 
 make_video_with_libx264() {
     local description="生成avc编码的mp4格式视频（libx264）"
-    local output_path="output_video"
+    local output_path="video_x264"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
@@ -175,6 +175,7 @@ make_video_with_libx264() {
             video_maxrate="3M"
         fi
     else
+        echo
         video_maxrate="3M"
     fi
 
@@ -191,6 +192,7 @@ make_video_with_libx264() {
             watermark_flag="y"
         fi
     else
+        echo
         watermark_flag="y"
     fi
 
@@ -217,7 +219,7 @@ make_video_with_libx264() {
 
 image_to_webp() {
     local description="压缩图片，全部转为webp格式"
-    local output_path="compress_image"
+    local output_path="image_compress"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
@@ -235,9 +237,9 @@ image_to_webp() {
     finished_work "$output_path"
 }
 
-merge_mp4_audio() {
+merge_mp4_with_audio() {
     local description="合并视频和音频：mp4+m4a/mp3"
-    local output_path="output_video"
+    local output_path="video_with_audio"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
@@ -278,7 +280,7 @@ flv_to_mp4() {
 
 video_to_hevc() {
     local description="压缩视频，全部转为hevc编码的mp4格式（libx265）"
-    local output_path="compress_video"
+    local output_path="video_compress"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
@@ -312,7 +314,7 @@ retrieve_audio_album() {
 
 attach_image_to_audio() {
     local description="为音频添加封面图"
-    local output_path="output_audio"
+    local output_path="audio_attach_image"
     preparational_work "$description" "$output_path"
     if [ $? -eq 10 ]; then
         return 0
@@ -336,12 +338,56 @@ attach_image_to_audio() {
     finished_work "$output_path"
 }
 
+rename_audio() {
+    local description="重命名音频"
+    local output_path="audio_rename"
+    preparational_work "$description" "$output_path"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    local drop_chapter_flag
+    echo "提示：不输入（等待10s）或直接回车，则默认保留章节标记，若需要删除请输入y。"
+    if read -t 10 -r -p "是否删除章节标记（默认n）：" watermark_flag; then
+        if [ "$watermark_flag" = "" ]; then
+            drop_chapter_flag="n"
+        fi
+    else
+        echo
+        drop_chapter_flag="n"
+    fi
+
+    local audio_title audio_artist
+    shopt -s nullglob
+    for file in *.mp3 *.m4a *.flac; do
+        audio_title=$(ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 "$file")
+        audio_artist=$(ffprobe -loglevel error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 "$file")
+        if [ "$audio_title" = "" ] || [ "$audio_artist" = "" ]; then
+            echo "$file 没有元数据信息，无法完成重命名操作"
+        else
+            if [ "$drop_chapter_flag" = "n" ]; then
+                cp "$file" "$output_path/$audio_title - $audio_artist.${file##*.}"
+                echo "已将 $file 重命名为 $audio_title - $audio_artist.${file##*.}"
+            else
+                ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$audio_title - $audio_artist.${file##*.}"
+            fi
+        fi
+    done
+    shopt -u nullglob
+
+    finished_work "$output_path"
+}
+
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "为音频添加封面图" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
+        "重命名音频")
+            rename_audio
+            break
+            ;;
         "为音频添加封面图")
             attach_image_to_audio
             break
@@ -363,7 +409,7 @@ while true; do
             break
             ;;
         "合并视频和音频：mp4+m4a/mp3")
-            merge_mp4_audio
+            merge_mp4_with_audio
             break
             ;;
         "压缩图片，全部转为webp格式")
