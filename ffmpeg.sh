@@ -378,12 +378,34 @@ rename_audio() {
     finished_work "$output_path"
 }
 
+webp_to_png() {
+    local description="webp格式转png格式（删除源文件）"
+    preparational_work "$description"
+    if [ $? -eq 10 ]; then
+        return 0
+    fi
+
+    shopt -s nullglob
+    for file in *.webp; do
+        ffmpeg_no_banner -i "$file" "${file%.*}.png"
+        rm "$file"
+        echo "已删除 $file"
+    done
+    shopt -u nullglob
+
+    finished_work
+}
+
 while true; do
     echo "========================================"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "webp格式转png格式（删除源文件）" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
+        "webp格式转png格式（删除源文件）")
+            webp_to_png
+            break
+            ;;
         "重命名音频")
             rename_audio
             break
