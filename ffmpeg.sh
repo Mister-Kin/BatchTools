@@ -143,11 +143,39 @@ make_video_with_libx264() {
         watermark_flag="y"
     fi
 
+    local subtitle_flag
+    echo "提示：不输入（等待10s）或直接回车，则默认不添加字幕，若需要请输入y。"
+    if read -t 10 -r -p "是否添加字幕（默认n）：" subtitle_flag; then
+        if [ "$subtitle_flag" = "" ]; then
+            subtitle_flag="n"
+        fi
+    else
+        echo
+        subtitle_flag="n"
+    fi
+
+    local subtitle_file filter_type ass_count srt_count
+    if [ "$subtitle_flag" = "y" ]; then
+        ass_count=$(file_count "ass")
+        srt_count=$(file_count "srt")
+        if [ "$ass_count" -gt 0 ]; then
+            subtitle_file=(*.ass)
+            filter_type="ass"
+        elif [ "$srt_count" -gt 0 ]; then
+            subtitle_file=(*.srt)
+            filter_type="subtitles"
+        fi
+    fi
+
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)
-    if [ "$watermark_flag" = "y" ]; then
+    if [ "$watermark_flag" = "y" ] && [ "$subtitle_flag" = "n" ]; then
         filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
-    else
+    elif [ "$watermark_flag" = "n" ] && [ "$subtitle_flag" = "y" ]; then
+        filter_effect="$filter_type='${subtitle_file[0]}', format=yuv420p"
+    elif [ "$watermark_flag" = "y" ] && [ "$subtitle_flag" = "y" ]; then
+        filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] $filter_type='${subtitle_file[0]}', format=yuv420p"
+    elif [ "$watermark_flag" = "n" ] && [ "$subtitle_flag" = "n" ]; then
         filter_effect="format=yuv420p"
     fi
 
