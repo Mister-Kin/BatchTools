@@ -91,12 +91,13 @@ make_video_with_libx264() {
         return 0
     fi
 
-    local png_count jpg_count
+    local png_count jpg_count image_sequence_flag
     png_count=$(file_count "png")
     jpg_count=$(file_count "jpg")
     local file_name file_name_length input_file
-    if [ "$png_count" -gt 0 ] || [ "$jpg_count" -gt 0 ]; then
-        if [ "$png_count" -gt 0 ]; then
+    if [ "$png_count" -ge 24 ] || [ "$jpg_count" -ge 24 ]; then
+        image_sequence_flag=true
+        if [ "$png_count" -ge 24 ]; then
             for file in *.png; do
                 file_name=${file::-4}
                 file_name_length=${#file_name}
@@ -104,7 +105,7 @@ make_video_with_libx264() {
                 break
             done
             input_file="%0${file_name_length}d.png"
-        elif [ "$jpg_count" -gt 0 ]; then
+        elif [ "$jpg_count" -ge 24 ]; then
             for file in *.jpg; do
                 file_name=${file::-4}
                 file_name_length=${#file_name}
@@ -113,13 +114,24 @@ make_video_with_libx264() {
             done
             input_file="%0${file_name_length}d.jpg"
         fi
+        echo "因检测到图片序列，将合成图片序列为视频。"
     fi
 
+    local user_input
     local video_maxrate
-    echo "提示：不输入（等待10s）或直接回车，则默认最大码率为3M。"
-    if read -t 10 -r -p "请输入压制视频的最大码率（默认3M）：" video_maxrate; then
-        if [ "$video_maxrate" = "" ]; then
+    echo "提示：不输入（等待10s）或直接回车，则默认最大码率为3M（允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等）"
+    if read -t 10 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+        while ! [[ "$user_input" =~ (^$|^[0-9]+\.?[0-9]*[kKM]$) ]]; do
+            echo "当前输入错误，请重新输入。允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等。"
+            if ! read -t 10 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+                echo
+                video_maxrate="3M"
+            fi
+        done
+        if [[ "$user_input" =~ ^$ ]]; then
             video_maxrate="3M"
+        else
+            video_maxrate="$user_input"
         fi
     else
         echo
@@ -133,29 +145,49 @@ make_video_with_libx264() {
     local video_bufsize="${video_bufsize_number}${video_maxrate_unit}"
 
     local watermark_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认添加文字水印，若不需要请输入n。"
-    if read -t 10 -r -p "是否添加版权水印（默认y）：" watermark_flag; then
-        if [ "$watermark_flag" = "" ]; then
-            watermark_flag="y"
+    echo "提示：不输入（等待10s）或直接回车，则默认添加文字水印（默认是，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 10 -r -p "是否添加版权水印（默认是）：" user_input; then
+        while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
+            echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
+            if ! read -t 10 -r -p "是否添加版权水印（默认是）：" user_input; then
+                echo
+                # 这条语句代码逻辑上应该显式地声明，没有的话也无影响，read命令超时后，user_input的值会重置为空，所以后面正则表达会识别出来。
+                watermark_flag=true
+            fi
+        done
+        if [ "$user_input" = "是" ] || [[ "$user_input" =~ (^$|^[Yy]$|^[Yy][Ee][Ss]$) ]]; then
+            watermark_flag=true
+        elif [ "$user_input" = "否" ] || [[ "$user_input" =~ (^[Nn]$|^[Nn][Oo]) ]]; then
+            watermark_flag=false
         fi
     else
         echo
-        watermark_flag="y"
+        watermark_flag=true
     fi
 
     local subtitle_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认不添加字幕，若需要请输入y。"
-    if read -t 10 -r -p "是否添加字幕（默认n）：" subtitle_flag; then
-        if [ "$subtitle_flag" = "" ]; then
-            subtitle_flag="n"
+    echo "提示：不输入（等待10s）或直接回车，则默认不添加字幕（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 10 -r -p "是否添加字幕（默认否）：" user_input; then
+        while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
+            echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
+            if ! read -t 10 -r -p "是否删除添加字幕（默认否）：" user_input; then
+                echo
+                # 这条语句代码逻辑上应该显式地声明，没有的话也无影响，read命令超时后，user_input的值会重置为空，所以后面正则表达会识别出来。
+                subtitle_flag=false
+            fi
+        done
+        if [ "$user_input" = "是" ] || [[ "$user_input" =~ (^[Yy]$|^[Yy][Ee][Ss]$) ]]; then
+            subtitle_flag=true
+        elif [ "$user_input" = "否" ] || [[ "$user_input" =~ (^$|^[Nn]$|^[Nn][Oo]) ]]; then
+            subtitle_flag=false
         fi
     else
         echo
-        subtitle_flag="n"
+        subtitle_flag=false
     fi
 
     local subtitle_file filter_type ass_count srt_count
-    if [ "$subtitle_flag" = "y" ]; then
+    if [ "$subtitle_flag" = true ]; then
         ass_count=$(file_count "ass")
         srt_count=$(file_count "srt")
         if [ "$ass_count" -gt 0 ]; then
@@ -164,22 +196,25 @@ make_video_with_libx264() {
         elif [ "$srt_count" -gt 0 ]; then
             subtitle_file=(*.srt)
             filter_type="subtitles"
+        elif [ "$ass_count" -eq 0 ] && [ "$srt_count" -eq 0 ]; then
+            echo "当前路径并未检测到ass或者srt字幕文件，将无法添加字幕。"
+            subtitle_flag=false
         fi
     fi
 
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)
-    if [ "$watermark_flag" = "y" ] && [ "$subtitle_flag" = "n" ]; then
+    if [ "$watermark_flag" = true ] && [ "$subtitle_flag" = false ]; then
         filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
-    elif [ "$watermark_flag" = "n" ] && [ "$subtitle_flag" = "y" ]; then
+    elif [ "$watermark_flag" = false ] && [ "$subtitle_flag" = true ]; then
         filter_effect="$filter_type='${subtitle_file[0]}', format=yuv420p"
-    elif [ "$watermark_flag" = "y" ] && [ "$subtitle_flag" = "y" ]; then
+    elif [ "$watermark_flag" = true ] && [ "$subtitle_flag" = true ]; then
         filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] $filter_type='${subtitle_file[0]}', format=yuv420p"
-    elif [ "$watermark_flag" = "n" ] && [ "$subtitle_flag" = "n" ]; then
+    elif [ "$watermark_flag" = false ] && [ "$subtitle_flag" = false ]; then
         filter_effect="format=yuv420p"
     fi
 
-    if [ "$png_count" -gt 0 ] || [ "$jpg_count" -gt 0 ]; then
+    if [ "$image_sequence_flag" = true ]; then
         ffmpeg_no_banner -r 24 -f image2 -i "$input_file" -r 24 -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" "$output_path/output.mp4"
     else
         shopt -s nullglob
@@ -321,15 +356,25 @@ rename_audio() {
         return 0
     fi
 
+    local user_input
     local drop_chapter_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认保留章节标记，若需要删除请输入y。"
-    if read -t 10 -r -p "是否删除章节标记（默认n）：" watermark_flag; then
-        if [ "$watermark_flag" = "" ]; then
-            drop_chapter_flag="n"
+    echo "提示：不输入（等待10s）或直接回车，则默认保留章节标记（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 10 -r -p "是否删除章节标记（默认否）：" user_input; then
+        while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
+            echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
+            if ! read -t 10 -r -p "是否删除章节标记（默认否）：" user_input; then
+                echo
+                drop_chapter_flag=false
+            fi
+        done
+        if [ "$user_input" = "是" ] || [[ "$user_input" =~ (^[Yy]$|^[Yy][Ee][Ss]$) ]]; then
+            drop_chapter_flag=true
+        elif [ "$user_input" = "否" ] || [[ "$user_input" =~ (^$|^[Nn]$|^[Nn][Oo]) ]]; then
+            drop_chapter_flag=false
         fi
     else
         echo
-        drop_chapter_flag="n"
+        drop_chapter_flag=false
     fi
 
     local audio_title audio_artist
@@ -340,7 +385,7 @@ rename_audio() {
         if [ "$audio_title" = "" ] || [ "$audio_artist" = "" ]; then
             echo "$file 没有元数据信息，无法完成重命名操作"
         else
-            if [ "$drop_chapter_flag" = "n" ]; then
+            if [ "$drop_chapter_flag" = false ]; then
                 cp "$file" "$output_path/$audio_title - $audio_artist.${file##*.}"
                 echo "已将 $file 重命名为 $audio_title - $audio_artist.${file##*.}"
             else
