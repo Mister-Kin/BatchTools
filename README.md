@@ -10,11 +10,20 @@ Some batch scripts for easily doing work.
   - 生成avc编码的mp4格式视频（libx264）
   - 压缩图片，全部转为webp格式
   - 压缩视频，全部转为hevc编码的mp4格式（libx265）
+  - 重命名音频
+  - 为音频添加封面图
+  - 获取音频封面图
+  - webp格式转png格式（删除源文件）
   - flv格式转mp4格式
   - 显卡加速将图片序列合成为视频（不再维护该功能）
+- text.sh
+  - 合并文本文件
+  - 合并文本文件（逐行合并）
 
 ## Usage
 Just run the script file in terminal and follow the hint.
+
+P.S. Please ensure that only files you want to deal with exist in the path. It's hard to program with consideration of all situation, so the hint of program might not accord with your real situation.
 
 ## Author
 **BatchTools** © Mr. Kin, all files released under the [WTFPL][] license.
