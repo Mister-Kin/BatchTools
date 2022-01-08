@@ -9,43 +9,79 @@ ffmpeg_no_banner() {
 copyright_watermark() {
     local copyright_text="© Mr. Kin"
     local font_path="C\:\/Windows\/fonts\/SourceSans3-Semibold.otf"
-    local watermark_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=50:bordercolor=black:borderw=1:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
+    local watermark_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=50:bordercolor=black:borderw=1.5:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
     echo "$watermark_effect"
 }
 
 image_add_watermark() {
-    local description="给图片添加版权水印并压缩"
-    local output_path1="image_for_web"
-    local output_path2="image_for_general"
-    preparational_work "$description" "$output_path1" "$output_path2"
+    description "给图片添加版权水印并压缩" "将所有png文件或者jpg文件或者gif文件转换为webp和jpg格式，并添加版本水印，分别输出在「image_for_web」文件夹和「image_for_general」文件夹；" "确保路径下没有名为「image_for_web」文件夹和「image_for_general」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有这些文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
+        return 20
+    fi
+
+    local png_count jpg_count gif_count all_count
+    png_count=$(file_count "png")
+    jpg_count=$(file_count "jpg")
+    gif_count=$(file_count "gif")
+    all_count=$(("$png_count" + "$jpg_count" + "$gif_count"))
+
+    if [ "$png_count" -eq 0 ] && [ "$jpg_count" -eq 0 ] && [ "$gif_count" -eq 0 ]; then
+        echo "当前并未检测到png文件或者jpg文件或者gif文件，已退出本次的功能操作"
         return 0
     fi
+    if [ "$png_count" -gt 0 ]; then
+        echo "当前检测到$png_count个png文件"
+    fi
+    if [ "$jpg_count" -gt 0 ]; then
+        echo "当前检测到$jpg_count个jpg文件"
+    fi
+    if [ "$gif_count" -gt 0 ]; then
+        echo "当前检测到$gif_count个gif文件"
+    fi
+
+    local output_path1="image_for_web"
+    local output_path2="image_for_general"
+    make_directory "$output_path1" "$output_path2"
 
     local filter_effect
     filter_effect=$(copyright_watermark)
     local filter_effect_for_gif="$filter_effect, split[main][tmp]; [tmp]palettegen[palette]; [main][palette]paletteuse"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     shopt -s nullglob
     for file in *.png *.jpg; do
         ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path1/${file%.*}.webp"
+        draw_line "~"
         ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path2/${file%.*}.jpg"
+        draw_line "~"
+        ((operation_count += 2))
     done
     for file in *.gif; do
         ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path1/${file%.*}.webp"
+        draw_line "~"
         ffmpeg_no_banner -i "$file" -vf "$filter_effect_for_gif" "$output_path2/${file%.*}.gif"
+        draw_line "~"
+        ((operation_count += 2))
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path1" "$output_path2"
+    finished_word "directory" "$output_path1" "$output_path2"
 }
 
 image_sequence_to_video_with_gpu() {
-    local description="显卡加速将图片序列合成为视频（不再维护该功能）"
-    local output_path="output_video"
-    preparational_work "$description" "$output_path"
+    description "显卡加速将图片序列合成为视频（不再维护该功能）" "使用h264_nvenc，将png图片序列或者jpg图片序列合成为avc编码的mp4视频；生成的文件输出在「output_video」文件夹" "本功能已不再维护，存在着早期的代码逻辑设计，并未考虑文件检测逻辑和规范输入格式；确保路径下没有名为「output_video」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
+
+    local output_path="output_video"
+    make_directory "$output_path"
 
     local name_length
     echo "提示：不输入（等待10s）或直接回车，则默认长度为4，如0001.png"
@@ -80,50 +116,100 @@ image_sequence_to_video_with_gpu() {
         ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -c:v mjpeg_cuvid -r 24 -f image2 -i %0"$name_length"d.jpg -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "$output_path/output.mp4"
     fi
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 make_video_with_libx264() {
-    local description="生成avc编码的mp4格式视频（libx264）"
-    local output_path="video_x264"
-    preparational_work "$description" "$output_path"
+    description "生成avc编码的mp4格式视频（libx264）" "使用libx264，将png图片序列或者jpg图片序列合成为avc编码的mp4格式视频；也可以将mp4文件或者flv文件或者mov文件重新编码，生成avc编码的mp4格式视频；生成的文件输出在「video_x264」文件夹" "图片序列仅支持纯数字的文件名，如0001.png，并且图片序列文件数量不能小于24；重新编码音频是基于aac编码，使用libfdk_aac；确保路径下没有名为「video_x264」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
+        return 20
+    fi
+
+    local png_count jpg_count mp4_count flv_count mov_count all_count
+    png_count=$(file_count "png")
+    jpg_count=$(file_count "jpg")
+    mp4_count=$(file_count "mp4")
+    flv_count=$(file_count "flv")
+    mov_count=$(file_count "mov")
+    all_count=$(("$png_count" + "$jpg_count" + "$mp4_count" + "$flv_count" + "$mov_count"))
+
+    if [ "$png_count" -lt 24 ] && [ "$jpg_count" -lt 24 ] && [ "$mp4_count" -eq 0 ] && [ "$flv_count" -eq 0 ] && [ "$mov_count" -eq 0 ]; then
+        echo "当前并未检测到png图片序列或者jpg图片序列或者mp4文件或者flv文件或者mov文件，已退出本次的功能操作"
         return 0
     fi
 
-    local png_count jpg_count image_sequence_flag
-    png_count=$(file_count "png")
-    jpg_count=$(file_count "jpg")
-    local file_name file_name_length input_file
+    local file_name file_name_length input_file image_sequence_flag
     if [ "$png_count" -ge 24 ] || [ "$jpg_count" -ge 24 ]; then
-        image_sequence_flag=true
         if [ "$png_count" -ge 24 ]; then
             for file in *.png; do
                 file_name=${file::-4}
-                file_name_length=${#file_name}
-                echo "当前检测到png图片序列，文件名长度为$file_name_length"
+                if [[ "$file_name" =~ ^[0-9]+$ ]]; then
+                    image_sequence_flag=true
+                    file_name_length=${#file_name}
+                    echo "当前检测到png图片序列，文件名长度为$file_name_length，文件数量为$png_count"
+                else
+                    image_sequence_flag=false
+                    echo "当前检测到$png_count个png文件，但不是png图片序列"
+                fi
                 break
             done
             input_file="%0${file_name_length}d.png"
         elif [ "$jpg_count" -ge 24 ]; then
             for file in *.jpg; do
                 file_name=${file::-4}
-                file_name_length=${#file_name}
-                echo "当前检测到jpg图片序列，文件名长度为$file_name_length"
+                if [[ "$file_name" =~ ^[0-9]+$ ]]; then
+                    image_sequence_flag=true
+                    file_name_length=${#file_name}
+                    echo "当前检测到jpg图片序列，文件名长度为$file_name_length，文件数量为$jpg_count"
+                else
+                    image_sequence_flag=false
+                    echo "当前检测到$jpg_count个jpg文件，但不是jpg图片序列"
+                fi
                 break
             done
             input_file="%0${file_name_length}d.jpg"
         fi
-        echo "因检测到图片序列，将合成图片序列为视频。"
     fi
 
+    if [ "$png_count" -lt 24 ] && [ "$jpg_count" -lt 24 ]; then
+        image_sequence_flag=false
+        echo "当前并未检测到png图片序列或者jpg图片序列"
+    fi
+
+    local video_flag
+    if [ "$mp4_count" -gt 0 ]; then
+        video_flag=true
+        echo "当前检测到$mp4_count个mp4文件"
+    fi
+    if [ "$flv_count" -gt 0 ]; then
+        video_flag=true
+        echo "当前检测到$flv_count个flv文件"
+    fi
+    if [ "$mov_count" -gt 0 ]; then
+        video_flag=true
+        echo "当前检测到$mov_count个mov文件"
+    fi
+
+    if [ "$mp4_count" -eq 0 ] && [ "$flv_count" -eq 0 ] && [ "$mov_count" -eq 0 ]; then
+        video_flag=false
+        if [ "$image_sequence_flag" = false ]; then
+            echo "当前并未检测到mp4文件或者flv文件或者mov文件，已退出本次的功能操作"
+            return 0
+        fi
+    fi
+
+    local output_path="video_x264"
+    make_directory "$output_path"
+
+    draw_line "-"
     local user_input
     local video_maxrate
-    echo "提示：不输入（等待10s）或直接回车，则默认最大码率为3M（允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等）"
-    if read -t 10 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+    echo "提示：不输入（等待15s）或直接回车，则默认最大码率为3M（允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等）"
+    if read -t 15 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
         while ! [[ "$user_input" =~ (^$|^[0-9]+\.?[0-9]*[kKM]$) ]]; do
             echo "当前输入错误，请重新输入。允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等。"
-            if ! read -t 10 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+            if ! read -t 15 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
                 echo
                 video_maxrate="3M"
             fi
@@ -144,12 +230,13 @@ make_video_with_libx264() {
     video_bufsize_number=$(echo $video_maxrate_number | awk '{ printf "%.2f", $1 * 2 }')
     local video_bufsize="${video_bufsize_number}${video_maxrate_unit}"
 
+    draw_line "-"
     local watermark_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认添加文字水印（默认是，允许输入「是/否/yes/no/y/n」，不区分大小写）"
-    if read -t 10 -r -p "是否添加版权水印（默认是）：" user_input; then
+    echo "提示：不输入（等待15s）或直接回车，则默认添加文字水印（默认是，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 15 -r -p "是否添加版权水印（默认是）：" user_input; then
         while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
             echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
-            if ! read -t 10 -r -p "是否添加版权水印（默认是）：" user_input; then
+            if ! read -t 15 -r -p "是否添加版权水印（默认是）：" user_input; then
                 echo
                 # 这条语句代码逻辑上应该显式地声明，没有的话也无影响，read命令超时后，user_input的值会重置为空，所以后面正则表达会识别出来。
                 watermark_flag=true
@@ -165,14 +252,14 @@ make_video_with_libx264() {
         watermark_flag=true
     fi
 
+    draw_line "-"
     local subtitle_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认不添加字幕（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
-    if read -t 10 -r -p "是否添加字幕（默认否）：" user_input; then
+    echo "提示：不输入（等待15s）或直接回车，则默认不添加字幕（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 15 -r -p "是否添加字幕（默认否）：" user_input; then
         while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
             echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
-            if ! read -t 10 -r -p "是否删除添加字幕（默认否）：" user_input; then
+            if ! read -t 15 -r -p "是否删除添加字幕（默认否）：" user_input; then
                 echo
-                # 这条语句代码逻辑上应该显式地声明，没有的话也无影响，read命令超时后，user_input的值会重置为空，所以后面正则表达会识别出来。
                 subtitle_flag=false
             fi
         done
@@ -197,6 +284,7 @@ make_video_with_libx264() {
             subtitle_file=(*.srt)
             filter_type="subtitles"
         elif [ "$ass_count" -eq 0 ] && [ "$srt_count" -eq 0 ]; then
+            draw_line "-"
             echo "当前路径并未检测到ass或者srt字幕文件，将无法添加字幕。"
             subtitle_flag=false
         fi
@@ -214,52 +302,183 @@ make_video_with_libx264() {
         filter_effect="format=yuv420p"
     fi
 
-    if [ "$image_sequence_flag" = true ]; then
-        ffmpeg_no_banner -r 24 -f image2 -i "$input_file" -r 24 -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" "$output_path/output.mp4"
-    else
-        shopt -s nullglob
-        for file in *.mp4 *.flv *.mov; do
-            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "$output_path/${file%.*}.mp4"
-        done
-        shopt -u nullglob
+    local encode_audio_flag
+    if [ "$video_flag" = true ]; then
+        draw_line "-"
+        echo "提示：不输入（等待15s）或直接回车，则默认不重新编码音频，即复制音频流（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+        if read -t 15 -r -p "是否重新编码音频（默认否）：" user_input; then
+            while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
+                echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
+                if ! read -t 15 -r -p "是否重新编码音频（默认否）：" user_input; then
+                    echo
+                    encode_audio_flag=false
+                fi
+            done
+            if [ "$user_input" = "是" ] || [[ "$user_input" =~ (^[Yy]$|^[Yy][Ee][Ss]$) ]]; then
+                encode_audio_flag=true
+            elif [ "$user_input" = "否" ] || [[ "$user_input" =~ (^$|^[Nn]$|^[Nn][Oo]) ]]; then
+                encode_audio_flag=false
+            fi
+        else
+            echo
+            encode_audio_flag=false
+        fi
     fi
 
-    finished_work "$output_path"
+    local audio_rate
+    if [ "$encode_audio_flag" = true ]; then
+        draw_line "-"
+        echo "提示：不输入（等待15s）或直接回车，则默认码率为128k（允许输入格式为「数字」，单位由程序设置为k，例如输入192，程序会自动设置为192k）"
+        if read -t 15 -r -p "请输入压制音频的码率（默认128k）：" user_input; then
+            while ! [[ "$user_input" =~ (^$|^[0-9]+$) ]]; do
+                echo "当前输入错误，请重新输入。允许输入格式为「数字」，单位由程序设置为k，例如输入192，程序会自动设置为192k。"
+                if ! read -t 15 -r -p "请输入压制音频的码率（默认128k）：" user_input; then
+                    echo
+                    audio_rate="128k"
+                fi
+            done
+            if [[ "$user_input" =~ ^$ ]]; then
+                audio_rate="128k"
+            else
+                audio_rate="${user_input}k"
+            fi
+        else
+            echo
+            audio_rate="128k"
+        fi
+    fi
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
+    if [ "$image_sequence_flag" = true ]; then
+        ffmpeg_no_banner -r 24 -f image2 -i "$input_file" -r 24 -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" "$output_path/output.mp4"
+        draw_line "~"
+        ((operation_count++))
+    fi
+    if [ "$video_flag" = true ]; then
+        shopt -s nullglob
+        if [ "$encode_audio_flag" = true ]; then
+            for file in *.mp4 *.flv *.mov; do
+                ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_rate" "$output_path/${file%.*}.mp4"
+                draw_line "~"
+                ((operation_count++))
+            done
+        else
+            for file in *.mp4 *.flv *.mov; do
+                ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v 23 -profile:v high -maxrate:v "$video_maxrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "$output_path/${file%.*}.mp4"
+                draw_line "~"
+                ((operation_count++))
+            done
+        fi
+        shopt -u nullglob
+    fi
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
+
+    finished_word "directory" "$output_path"
 }
 
 image_to_webp() {
-    local description="压缩图片，全部转为webp格式"
-    local output_path="image_compress"
-    preparational_work "$description" "$output_path"
+    description "压缩图片，全部转为webp格式" "将所有png文件或者jpg文件或者gif文件转换成webp格式；生成的文件输出在「image_compress」文件夹" "确保路径下没有名为「image_compress」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
+    local png_count jpg_count gif_count all_count
+    png_count=$(file_count "png")
+    jpg_count=$(file_count "jpg")
+    gif_count=$(file_count "gif")
+    all_count=$(("$png_count" + "$jpg_count" + "$gif_count"))
+
+    if [ "$png_count" -eq 0 ] && [ "$jpg_count" -eq 0 ] && [ "$gif_count" -eq 0 ]; then
+        echo "当前并未检测到png文件或者jpg文件或者gif文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$png_count" -gt 0 ]; then
+        echo "当前检测到$png_count个png文件"
+    fi
+    if [ "$jpg_count" -gt 0 ]; then
+        echo "当前检测到$jpg_count个jpg文件"
+    fi
+    if [ "$gif_count" -gt 0 ]; then
+        echo "当前检测到$gif_count个gif文件"
+    fi
+
+    local output_path="image_compress"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     shopt -s nullglob
     for file in *.png *.jpg; do
         ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.webp"
+        draw_line "~"
+        ((operation_count++))
     done
     for file in *.gif; do
-        ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.webp"
+        ffmpeg_no_banner -i "$file" -vf "split[main][tmp]; [tmp]palettegen[palette]; [main][palette]paletteuse" "$output_path/${file%.*}.webp"
+        draw_line "~"
+        ((operation_count++))
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 merge_mp4_with_audio() {
-    local description="合并视频和音频：mp4+m4a/mp3"
-    local output_path="video_with_audio"
-    preparational_work "$description" "$output_path"
+    description "合并视频和音频：mp4+m4a/mp3" "将不含音频流的mp4文件和m4a文件或者mp3文件合并输出为mp4格式的视频，不涉及重新编码；生成的文件输出在「video_with_audio」文件夹" "确保路径下没有名为「video_with_audio」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
-    local audio_file m4a_count
+    local mp4_count m4a_count mp3_count all_count
+    mp4_count=$(file_count "mp4")
     m4a_count=$(file_count "m4a")
+    mp3_count=$(file_count "mp3")
+    all_count=$mp4_count
 
+    if [ "$m4a_count" -eq 0 ] && [ "$mp3_count" -eq 0 ] || [ "$mp4_count" -eq 0 ]; then
+        echo "当前并未同时检测到mp4文件和m4a/mp3文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$mp4_count" -ge 1 ]; then
+        echo "当前检测到$mp4_count个mp4文件"
+        if [ "$mp4_count" -gt 1 ]; then
+            echo "mp4文件的数量已超过1个，本功能操作只能选择最前一个mp4文件作为视频流；请确保自己所需操作的文件在第一个，或者路径中只有一个mp4文件"
+        fi
+    fi
+    if [ "$m4a_count" -eq 1 ] && [ "$mp3_count" -eq 1 ]; then
+        echo "当前检测到1个m4a文件和1个mp3文件，本程序将选用m4a文件作为封面图"
+    fi
+    if [ "$m4a_count" -ge 1 ]; then
+        echo "当前检测到$m4a_count个m4a文件"
+        if [ "$m4a_count" -gt 1 ]; then
+            echo "m4a文件的数量已超过1个，本功能操作只能选择最前一个m4a文件作为音频流；请确保自己所需操作的文件在第一个，或者路径中只有一个m4a文件"
+        fi
+    fi
+    if [ "$mp3_count" -ge 1 ]; then
+        echo "当前检测到$mp3_count个mp3文件"
+        if [ "$mp3_count" -gt 1 ]; then
+            echo "mp3文件的数量已超过1个，本功能操作只能选择最前一个mp3文件作为音频流；请确保自己所需操作的文件在第一个，或者路径中只有一个mp3文件"
+        fi
+    fi
+
+    local output_path="video_with_audio"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local audio_file mp4_file
+    local operation_count=0
     shopt -s nullglob
-    local mp4_file=(*.mp4)
+    mp4_file=(*.mp4)
     if [ "$m4a_count" -gt 0 ]; then
         audio_file=(*.m4a)
     else
@@ -268,101 +487,246 @@ merge_mp4_with_audio() {
     shopt -u nullglob
 
     ffmpeg_no_banner -i "${mp4_file[0]}" -i "${audio_file[0]}" -c copy "$output_path/${mp4_file[0]}"
+    draw_line "~"
+    ((operation_count++))
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 flv_to_mp4() {
-    local description="flv格式转mp4格式"
-    preparational_work "$description"
+    description "flv格式转mp4格式" "将所有flv文件转换为mp4文件，仅仅是转换封装格式，不涉及重新编码"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
-    shopt -s nullglob
+    local flv_count all_count
+    flv_count=$(file_count "flv")
+    all_count=$flv_count
+
+    if [ "$flv_count" -eq 0 ]; then
+        echo "当前并未检测到任何flv文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$flv_count" -gt 0 ]; then
+        echo "当前检测到$flv_count个flv文件"
+    fi
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     for file in *.flv; do
         ffmpeg_no_banner -i "$file" -c copy "${file%.*}.mp4"
+        draw_line "~"
+        ((operation_count++))
     done
-    shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work
+    finished_word "file" "xxx.mp4"
 }
 
 video_to_hevc() {
-    local description="压缩视频，全部转为hevc编码的mp4格式（libx265）"
-    local output_path="video_compress"
-    preparational_work "$description" "$output_path"
+    description "压缩视频，全部转为hevc编码的mp4格式（libx265）" "使用libx264，将所有mp4文件或者flv文件或者mov文件转换hevc编码的mp4格式视频；生成的文件输出在「video_compress」文件夹" "确保路径下没有名为「video_compress」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
+    local mp4_count flv_count mov_count all_count
+    mp4_count=$(file_count "mp4")
+    flv_count=$(file_count "flv")
+    mov_count=$(file_count "mov")
+    all_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
+
+    if [ "$mp4_count" -eq 0 ] && [ "$flv_count" -eq 0 ] && [ "$mov_count" -eq 0 ]; then
+        echo "当前并未检测到任何mp4文件或者flv文件或者mov文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$mp4_count" -gt 0 ]; then
+        echo "当前检测到$mp4_count个mp4文件"
+    fi
+    if [ "$flv_count" -gt 0 ]; then
+        echo "当前检测到$flv_count个flv文件"
+    fi
+    if [ "$mov_count" -gt 0 ]; then
+        echo "当前检测到$mov_count个mov文件"
+    fi
+
+    local output_path="video_compress"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     shopt -s nullglob
     for file in *.mp4 *.flv *.mov; do
         ffmpeg_no_banner -i "$file" -c:v libx265 -c:a copy "$output_path/${file%.*}.mp4"
+        draw_line "~"
+        ((operation_count++))
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 retrieve_audio_album() {
-    local description="获取音频封面图"
-    local output_path="audio_album"
-    preparational_work "$description" "$output_path"
+    description "获取音频封面图" "获取所有mp3文件或者m4a文件或者flac文件的音频封面图，生成png文件输出在「audio_album」文件夹" "确保路径下没有名为「audio_album」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
+    local m4a_count mp3_count flac_count all_count
+    m4a_count=$(file_count "m4a")
+    mp3_count=$(file_count "mp3")
+    flac_count=$(file_count "flac")
+    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    if [ "$m4a_count" -eq 0 ] && [ "$mp3_count" -eq 0 ] && [ "$flac_count" -eq 0 ]; then
+        echo "当前并未检测到任何m4a文件或者mp3文件或者flac文件，已退出本次的功能的操作"
+        return 0
+    fi
+    if [ "$m4a_count" -gt 0 ]; then
+        echo "当前检测到$m4a_count个m4a文件"
+    fi
+    if [ "$mp3_count" -gt 0 ]; then
+        echo "当前检测到$mp3_count个mp3文件"
+    fi
+    if [ "$flac_count" -gt 0 ]; then
+        echo "当前检测到$flac_count个flac文件"
+    fi
+
+    local output_path="audio_album"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     shopt -s nullglob
     for file in *.mp3 *.m4a *.flac; do
         ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/${file%.*}.png"
+        draw_line "~"
+        ((operation_count++))
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 attach_image_to_audio() {
-    local description="为音频添加封面图"
-    local output_path="audio_attach_image"
-    preparational_work "$description" "$output_path"
+    description "为音频添加封面图" "为mp3文件或者m4a文件或者flac文件添加封面图；生成的文件输出在「audio_attach_image」文件夹" "封面图只能为png格式或者jpg格式；确保路径下没有名为「audio_attach_image」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
-    local png_count image_file
+    local png_count jpg_count mp3_count m4a_count flac_count all_count
     png_count=$(file_count "png")
+    jpg_count=$(file_count "jpg")
+    m4a_count=$(file_count "m4a")
+    mp3_count=$(file_count "mp3")
+    flac_count=$(file_count "flac")
+    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    if [ "$png_count" -eq 0 ] && [ "$jpg_count" -eq 0 ]; then
+        echo "当前并未检测到任何png文件或者jpg文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$png_count" -eq 1 ] && [ "$jpg_count" -eq 1 ]; then
+        echo "当前检测到1个png文件和1个jpg文件，本程序将选用png文件作为封面图"
+    fi
+    if [ "$png_count" -ge 1 ]; then
+        echo "当前检测到$png_count个png文件"
+        if [ "$png_count" -gt 1 ]; then
+            echo "png文件的数量已超过1个，本程序将选用第一个文件作为封面图"
+        fi
+    fi
+    if [ "$jpg_count" -ge 1 ]; then
+        echo "当前检测到$jpg_count个jpg文件"
+        if [ "$jpg_count" -gt 1 ]; then
+            echo "jpg文件的数量已超过1个，本程序将选用第一个文件作为封面图"
+        fi
+    fi
+    if [ "$m4a_count" -eq 0 ] && [ "$mp3_count" -eq 0 ] && [ "$flac_count" -eq 0 ]; then
+        echo "当前并未检测到任何m4a文件或者mp3文件或者flac文件，已退出本次的功能的操作"
+        return 0
+    fi
+    if [ "$m4a_count" -gt 0 ]; then
+        echo "当前检测到$m4a_count个m4a文件"
+    fi
+    if [ "$mp3_count" -gt 0 ]; then
+        echo "当前检测到$mp3_count个mp3文件"
+    fi
+    if [ "$flac_count" -gt 0 ]; then
+        echo "当前检测到$flac_count个flac文件"
+    fi
 
+    local output_path="audio_attach_image"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     shopt -s nullglob
+    local image_file
     if [ "$png_count" -gt 0 ]; then
         image_file=(*.png)
     else
         image_file=(*.jpg)
     fi
-
     for file in *.mp3 *.m4a *.flac; do
         ffmpeg_no_banner -i "$file" -i "${image_file[0]}" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
+        draw_line "~"
+        ((operation_count++))
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 rename_audio() {
-    local description="重命名音频"
-    local output_path="audio_rename"
-    preparational_work "$description" "$output_path"
+    description "重命名音频" "使用音频文件的元数据（metadata），重命名mp3文件或者m4a文件或者flac文件；生成的文件输出在「audio_rename」文件夹" "确保路径下没有名为「audio_rename」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
+    local m4a_count mp3_count flac_count all_count
+    m4a_count=$(file_count "m4a")
+    mp3_count=$(file_count "mp3")
+    flac_count=$(file_count "flac")
+    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    if [ "$m4a_count" -eq 0 ] && [ "$mp3_count" -eq 0 ] && [ "$flac_count" -eq 0 ]; then
+        echo "当前并未检测到任何m4a文件或者mp3文件或者flac文件，已退出本次的功能的操作"
+        return 0
+    fi
+    if [ "$m4a_count" -gt 0 ]; then
+        echo "当前检测到$m4a_count个m4a文件"
+    fi
+    if [ "$mp3_count" -gt 0 ]; then
+        echo "当前检测到$mp3_count个mp3文件"
+    fi
+    if [ "$flac_count" -gt 0 ]; then
+        echo "当前检测到$flac_count个flac文件"
+    fi
+
+    local output_path="audio_rename"
+    make_directory "$output_path"
+
+    draw_line "-"
     local user_input
     local drop_chapter_flag
-    echo "提示：不输入（等待10s）或直接回车，则默认保留章节标记（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
-    if read -t 10 -r -p "是否删除章节标记（默认否）：" user_input; then
+    echo "提示：不输入（等待15s）或直接回车，则默认保留章节标记（默认否，允许输入「是/否/yes/no/y/n」，不区分大小写）"
+    if read -t 15 -r -p "是否删除章节标记（默认否）：" user_input; then
         while ! [[ "$user_input" =~ (^$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
             echo "当前输入错误，请重新输入。允许输入「是/否/yes/no/y/n」，不区分大小写。"
-            if ! read -t 10 -r -p "是否删除章节标记（默认否）：" user_input; then
+            if ! read -t 15 -r -p "是否删除章节标记（默认否）：" user_input; then
                 echo
                 drop_chapter_flag=false
             fi
@@ -377,6 +741,10 @@ rename_audio() {
         drop_chapter_flag=false
     fi
 
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     local audio_title audio_artist
     shopt -s nullglob
     for file in *.mp3 *.m4a *.flac; do
@@ -384,86 +752,133 @@ rename_audio() {
         audio_artist=$(ffprobe -loglevel error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 "$file")
         if [ "$audio_title" = "" ] || [ "$audio_artist" = "" ]; then
             echo "$file 没有元数据信息，无法完成重命名操作"
+            draw_line "~"
         else
             if [ "$drop_chapter_flag" = false ]; then
                 cp "$file" "$output_path/$audio_title - $audio_artist.${file##*.}"
                 echo "已将 $file 重命名为 $audio_title - $audio_artist.${file##*.}"
+                draw_line "~"
+                ((operation_count++))
             else
                 ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$audio_title - $audio_artist.${file##*.}"
+                draw_line "~"
+                ((operation_count++))
             fi
         fi
     done
     shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work "$output_path"
+    finished_word "directory" "$output_path"
 }
 
 webp_to_png() {
-    local description="webp格式转png格式（删除源文件）"
-    preparational_work "$description"
+    description "webp格式转png格式（删除源文件）" "将webp文件转换为png文件，并删除webp源文件"
+    change_directory
     if [ $? -eq 10 ]; then
-        return 0
+        return 20
     fi
 
-    shopt -s nullglob
+    local webp_count all_count
+    webp_count=$(file_count "webp")
+    all_count=$webp_count
+    if [ "$webp_count" -eq 0 ]; then
+        echo "当前并未检测到webp文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$webp_count" -gt 0 ]; then
+        echo "当前检测到$webp_count个webp文件"
+    fi
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
     for file in *.webp; do
         ffmpeg_no_banner -i "$file" "${file%.*}.png"
+        draw_line "~"
         rm "$file"
         echo "已删除 $file"
+        draw_line "~"
+        ((operation_count++))
     done
-    shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
 
-    finished_work
+    finished_word
 }
 
 while true; do
-    echo "========================================"
+    clear
+    draw_line "="
+    echo "FFmpeg批处理工具主菜单："
     options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "webp格式转png格式（删除源文件）" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
         "webp格式转png格式（删除源文件）")
-            webp_to_png
+            while [ $? -ne 20 ]; do
+                webp_to_png
+            done
             break
             ;;
         "重命名音频")
-            rename_audio
+            while [ $? -ne 20 ]; do
+                rename_audio
+            done
             break
             ;;
         "为音频添加封面图")
-            attach_image_to_audio
+            while [ $? -ne 20 ]; do
+                attach_image_to_audio
+            done
             break
             ;;
         "获取音频封面图")
-            retrieve_audio_album
+            while [ $? -ne 20 ]; do
+                retrieve_audio_album
+            done
             break
             ;;
         "生成avc编码的mp4格式视频（libx264）")
-            make_video_with_libx264
+            while [ $? -ne 20 ]; do
+                make_video_with_libx264
+            done
             break
             ;;
         "压缩视频，全部转为hevc编码的mp4格式（libx265）")
-            video_to_hevc
+            while [ $? -ne 20 ]; do
+                video_to_hevc
+            done
             break
             ;;
         "flv格式转mp4格式")
-            flv_to_mp4
+            while [ $? -ne 20 ]; do
+                flv_to_mp4
+            done
             break
             ;;
         "合并视频和音频：mp4+m4a/mp3")
-            merge_mp4_with_audio
+            while [ $? -ne 20 ]; do
+                merge_mp4_with_audio
+            done
             break
             ;;
         "压缩图片，全部转为webp格式")
-            image_to_webp
+            while [ $? -ne 20 ]; do
+                image_to_webp
+            done
             break
             ;;
         "显卡加速将图片序列合成为视频（不再维护该功能）")
-            image_sequence_to_video_with_gpu
+            while [ $? -ne 20 ]; do
+                image_sequence_to_video_with_gpu
+            done
             break
             ;;
         "给图片添加版权水印并压缩")
-            image_add_watermark
+            while [ $? -ne 20 ]; do
+                image_add_watermark
+            done
             break
             ;;
         "退出程序")
