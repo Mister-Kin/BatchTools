@@ -39,12 +39,12 @@ merge_text_file() {
         file_type="*.txt"
         output_file="merged.txt"
     fi
-    if [ "$srt_count" -lt 2 ] && [ "$srt_count" -ge 2 ]; then
+    if [ "$txt_count" -lt 2 ] && [ "$srt_count" -ge 2 ]; then
         echo "当前检测到$srt_count个srt文件"
         file_type="*.srt"
         output_file="merged.srt"
     fi
-    if [ "$srt_count" -ge 2 ] && [ "$srt_count" -ge 2 ]; then
+    if [ "$txt_count" -ge 2 ] && [ "$srt_count" -ge 2 ]; then
         echo "当前检测到$txt_count个txt文件和$srt_count个srt文件"
         file_type="*.txt *.srt"
         output_file="merged.txt和merged.srt"
