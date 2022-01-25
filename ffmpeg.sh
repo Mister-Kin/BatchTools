@@ -897,12 +897,10 @@ split_video() {
         # 处理前面只有0的输入情况
         if [[ "$user_input" =~ ^0+\.[0-5]?[0-9]$ ]]; then
             end_time_text=${user_input#*.}
+        elif [[ "$user_input" =~ ^0+\.[0-5]?[0-9]\.[0-5]?[0-9]$ ]]; then
+            end_time_text=${user_input#*.}
         else
-            if [[ "$user_input" =~ ^0+\.[0-5]?[0-9]\.[0-5]?[0-9]$ ]]; then
-                end_time_text=${user_input#*.}
-            else
-                end_time_text="$user_input"
-            fi
+            end_time_text="$user_input"
         fi
 
         end_time=$(caculate_end_time_for_splitting_video "$user_input" "$video_duration_integer")
