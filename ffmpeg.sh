@@ -935,14 +935,55 @@ split_video() {
     finished_word "directory" "$output_path"
 }
 
+tga_to_png() {
+    description "tga格式转png格式" "将所有tga文件转换成png格式；生成的文件输出在「tga_to_png_output」文件夹" "确保路径下没有名为「tga_to_png_output」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    change_directory
+    if [ $? -eq 10 ]; then
+        return 20
+    fi
+
+    local tga_count all_count
+    tga_count=$(file_count "tga")
+    all_count=$tga_count
+    if [ "$tga_count" -eq 0 ]; then
+        echo "当前并未检测到tga文件，已退出本次的功能操作"
+        return 0
+    fi
+    if [ "$tga_count" -gt 0 ]; then
+        echo "当前检测到$tga_count个webp文件"
+    fi
+
+    local output_path="tga_to_png_output"
+    make_directory "$output_path"
+
+    draw_line "-"
+    echo "已开始本次的功能操作"
+    draw_line "~"
+    local operation_count=0
+    for file in *.tga; do
+        ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.png"
+        draw_line "~"
+        ((operation_count++))
+    done
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
+
+    finished_word "directory" "$output_path"
+}
+
 while true; do
     clear
     draw_line "="
     echo "FFmpeg批处理工具主菜单："
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "webp格式转png格式（删除源文件）" "无损分割视频" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片，全部转为webp格式" "压缩视频，全部转为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "webp格式转png格式（删除源文件）" "tga格式转png格式" "无损分割视频" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3="请选择菜单："
     select option in "${options[@]}"; do
         case $option in
+        "tga格式转png格式")
+            while [ $? -ne 20 ]; do
+                tga_to_png
+            done
+            break
+            ;;
         "无损分割视频")
             while [ $? -ne 20 ]; do
                 split_video
