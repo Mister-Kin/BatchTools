@@ -950,7 +950,7 @@ tga_to_png() {
         return 0
     fi
     if [ "$tga_count" -gt 0 ]; then
-        echo "当前检测到$tga_count个webp文件"
+        echo "当前检测到$tga_count个tga文件"
     fi
 
     local output_path="tga_to_png_output"
