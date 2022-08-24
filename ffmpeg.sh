@@ -942,15 +942,16 @@ tga_to_png() {
         return 20
     fi
 
-    local tga_count all_count
+    local tga_count TGA_count all_count
     tga_count=$(file_count "tga")
-    all_count=$tga_count
-    if [ "$tga_count" -eq 0 ]; then
-        echo "当前并未检测到tga文件，已退出本次的功能操作"
+    TGA_count=$(file_count "TGA")
+    all_count=$(("$tga_count" + "$TGA_count"))
+    if [ "$tga_count" -eq 0 ] && [ "$TGA_count" -eq 0 ]; then
+        echo "当前并未检测到tga文件和TGA文件，已退出本次的功能操作"
         return 0
     fi
-    if [ "$tga_count" -gt 0 ]; then
-        echo "当前检测到$tga_count个tga文件"
+    if [ "$tga_count" -gt 0 ] || [ "$TGA_count" -gt 0 ]; then
+        echo "当前检测到$tga_count个tga文件和$TGA_count个TGA文件"
     fi
 
     local output_path="tga_to_png_output"
@@ -960,12 +961,14 @@ tga_to_png() {
     echo "已开始本次的功能操作"
     draw_line "~"
     local operation_count=0
-    for file in *.tga; do
+    shopt -s nullglob
+    for file in *.tga *.TGA; do
         ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.png"
         draw_line "~"
         ((operation_count++))
     done
-    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
+    shopt -u nullglob
+    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件，其中$tga_count个tga文件和$TGA_count个TGA文件）"
 
     finished_word "directory" "$output_path"
 }
