@@ -205,23 +205,23 @@ make_video_with_libx264() {
     draw_line "-"
     local user_input
     local video_maxrate
-    echo "提示：不输入（等待15s）或直接回车，则默认最大码率为3M（允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等）"
-    if read -t 15 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+    echo "提示：不输入（等待15s）或直接回车，则默认最大码率为20M（允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等）"
+    if read -t 15 -r -p "请输入压制视频的最大码率（默认20M）：" user_input; then
         while ! [[ "$user_input" =~ (^$|^[0-9]+\.?[0-9]*[kKM]$) ]]; do
             echo "当前输入错误，请重新输入。允许输入格式为「数字（允许带小数）+单位（k/K/M）」，例如300k、1.5M等。"
-            if ! read -t 15 -r -p "请输入压制视频的最大码率（默认3M）：" user_input; then
+            if ! read -t 15 -r -p "请输入压制视频的最大码率（默认20M）：" user_input; then
                 echo
-                video_maxrate="3M"
+                video_maxrate="20M"
             fi
         done
         if [[ "$user_input" =~ ^$ ]]; then
-            video_maxrate="3M"
+            video_maxrate="20M"
         else
             video_maxrate="$user_input"
         fi
     else
         echo
-        video_maxrate="3M"
+        video_maxrate="20M"
     fi
 
     local video_maxrate_unit=${video_maxrate: -1}   # 获取最后一个字符
