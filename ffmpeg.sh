@@ -47,13 +47,21 @@ image_add_watermark() {
     local filter_effect
     filter_effect=$(copyright_watermark)
     local filter_effect_for_gif="$filter_effect, split[main][tmp]; [tmp]palettegen[palette]; [main][palette]paletteuse"
+    local filter_effect_for_compress="$filter_effect, split[main][tmp]; [tmp]palettegen=max_colors=256:stats_mode=single[palette]; [main][palette] paletteuse"
 
     draw_line "-"
     echo "已开始本次的功能操作"
     draw_line "~"
     local operation_count=0
     shopt -s nullglob
-    for file in *.png *.jpg; do
+    for file in *.png; do
+        ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path1/${file%.*}.webp"
+        draw_line "~"
+        ffmpeg_no_banner -i "$file" -vf "$filter_effect_for_compress" -pix_fmt pal8 "$output_path2/${file%.*}.png"
+        draw_line "~"
+        ((operation_count += 2))
+    done
+    for file in *.jpg; do
         ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path1/${file%.*}.webp"
         draw_line "~"
         ffmpeg_no_banner -i "$file" -vf "$filter_effect" "$output_path2/${file%.*}.jpg"
