@@ -1,19 +1,5 @@
 #!/bin/bash
 
-draw_line() {
-    printf %"$(tput cols)"s | tr " " "$1"
-}
-
-description() {
-    echo
-    draw_line "="
-    echo "功能：$1"
-    echo "介绍：$2"
-    if [ $# -eq 3 ]; then
-        echo "注意事项：$3"
-    fi
-}
-
 detect_and_remove() {
     if [ "$1" = "file" ]; then
         if [ -f "$2" ]; then
@@ -63,25 +49,13 @@ make_directory() {
     fi
 }
 
-finished_word() {
-    draw_line "-"
+make_directory_with_no_line() {
     if [ $# -gt 0 ]; then
-        if [ "$1" = "file" ]; then
-            echo -n "文件已输出为$2"
-            if [ $# -eq 3 ]; then
-                echo -n "和$3"
-            fi
-            echo
-        elif [ "$1" = "directory" ]; then
-            echo -n "文件已输出在$2文件夹"
-            if [ $# -eq 3 ]; then
-                echo -n "和$3文件夹"
-            fi
-            echo
-        fi
+        detect_and_remove "directory" "$1" "mkdir"
     fi
-    cd ~- || return
-    echo "已切换回上一次的工作路径"
+    if [ $# -eq 2 ]; then
+        detect_and_remove "directory" "$2" "mkdir"
+    fi
 }
 
 file_count() {
