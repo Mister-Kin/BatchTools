@@ -8,12 +8,14 @@ Some batch scripts for easily doing work.
   - 给图片添加版权水印并压缩
   - 合并视频和音频：mp4+m4a/mp3
   - 生成avc编码的mp4格式视频（libx264）
-  - 压缩图片，全部转为webp格式
-  - 压缩视频，全部转为hevc编码的mp4格式（libx265）
+  - 压缩图片（原格式压缩或者转换为webp格式）
+  - 压缩视频，转换为hevc编码的mp4格式（libx265）
   - 重命名音频
   - 为音频添加封面图
   - 获取音频封面图
   - webp格式转png格式（删除源文件）
+  - tga格式转png格式
+  - 无损分割视频
   - flv格式转mp4格式
   - 显卡加速将图片序列合成为视频（不再维护该功能）
 - text.sh
@@ -21,6 +23,10 @@ Some batch scripts for easily doing work.
   - 合并文本文件（逐行合并）
 
 ## Usage
+[Jump to Documentation Page][]
+
+[Jump to Documentation Page]: https://mister-kin.github.io/works/software-works/batch-tools/
+
 Just run the script file in terminal and follow the hint.
 
 P.S. Please ensure that only files you want to deal with exist in the path. It's hard to program with consideration of all situation, so the hint of program might not accord with your real situation.
@@ -30,14 +36,15 @@ P.S. Please ensure that only files you want to deal with exist in the path. It's
 
 Authored and maintained by Mr. Kin.
 
-> [Blog][] · [Github][] · [Weibo][] · [Zhihu][] · [Bilibili][] · [Youku][] · [Headline][] · [Youtube][]
+> [Blog][] · [GitHub][] · [Weibo][] · [Zhihu][] · [AcFun][] · [Bilibili][] · [Youku][] · [Headline][] · [YouTube][]
 
 [WTFPL]: ./LICENSE
 [Blog]: https://mister-kin.github.io
-[Github]: https://github.com/mister-kin
+[GitHub]: https://github.com/mister-kin
 [Weibo]: https://weibo.com/6270111192/profile?topnav=1&wvr=6&is_all=1
 [Bilibili]: http://space.bilibili.com/17025250?
 [Youku]: http://i.youku.com/i/UNjA3MTk5Mjgw?spm=a2hzp.8253869.0.0
-[Youtube]: https://www.youtube.com/channel/UCNhtdG6whC5mlRDkrhQ0wLA?view_as=public
+[YouTube]: https://www.youtube.com/channel/UCNhtdG6whC5mlRDkrhQ0wLA?view_as=public
 [Headline]: https://www.toutiao.com/c/user/835254071079053/#mid=1663279303982091
 [Zhihu]: https://www.zhihu.com/people/drwu-94
+[AcFun]: https://www.acfun.cn/u/73269306
