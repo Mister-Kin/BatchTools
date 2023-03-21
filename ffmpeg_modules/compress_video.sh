@@ -1,50 +1,61 @@
 #!/bin/bash
 
 compress_video() {
-    description "压缩视频，转换为hevc编码的mp4格式（libx265）" "使用libx265，将所有mp4文件或者flv文件或者mov文件转换hevc编码的mp4格式视频；生成的文件输出在「video_compress_to_hevc」文件夹" "确保路径下没有名为「video_compress_to_hevc」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+    local output_path="video_compress_to_hevc"
+    local feature_name feature_intro feature_note
+    feature_name="压缩视频，转换为hevc编码的mp4格式（libx265）"
+    feature_intro="使用libx265，将所有mp4文件或者flv文件或者mov文件转换hevc编码的mp4格式$(description_append_intro "设置压制视频的crf值；设置压制视频的preset值；是否删除源文件")"
+    feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "$output_path")"
+    description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
     if [ $? -eq 10 ]; then
         return 20
     fi
 
-    local mp4_count flv_count mov_count MP4_count FLV_count MOV_count all_count
+    local all_count mp4_count flv_count mov_count
     mp4_count=$(file_count "mp4")
     flv_count=$(file_count "flv")
     mov_count=$(file_count "mov")
-    MP4_count=$(file_count "MP4")
-    FLV_count=$(file_count "FLV")
-    MOV_count=$(file_count "MOV")
-    all_count=$(("$mp4_count" + "$flv_count" + "$mov_count" + "$MP4_count" + "$FLV_count" + "$MOV_count"))
-
-    if [ "$mp4_count" -eq 0 ] && [ "$flv_count" -eq 0 ] && [ "$mov_count" -eq 0 ] && [ "$MP4_count" -eq 0 ] && [ "$FLV_count" -eq 0 ] && [ "$MOV_count" -eq 0 ]; then
-        echo "当前并未检测到任何mp4文件或者flv文件或者mov文件或者MP4文件或者FLV文件或者MOV文件，已退出本次的功能操作"
+    all_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
+    if [ "$mp4_count" -eq 0 ] && [ "$flv_count" -eq 0 ] && [ "$mov_count" -eq 0 ]; then
+        file_not_detected "mp4" "flv" "mov"
         return 0
     fi
-    if [ "$mp4_count" -gt 0 ] || [ "$MP4_count" -gt 0 ]; then
-        echo "当前检测到$mp4_count个mp4文件，$MP4_count个MP4文件"
-    fi
-    if [ "$flv_count" -gt 0 ] || [ "$FLV_count" -gt 0 ]; then
-        echo "当前检测到$flv_count个flv文件，$FLV_count个FLV文件"
-    fi
-    if [ "$mov_count" -gt 0 ] || [ "$MOV_count" -gt 0 ]; then
-        echo "当前检测到$mov_count个mov文件，$MOV_count个MOV文件"
-    fi
 
-    local output_path="video_compress_to_hevc"
-    make_directory "$output_path"
+    local video_crf
+    video_crf=$(input_number "请输入压制视频的crf值" "默认crf值为28" "允许输入范围「0-51」" "28" "(^$|^[0-9]$|^[1-4][0-9]$|^5[0-1]$)")
+    local video_preset video_preset_array_to_string
+    video_preset_array_to_string="ultrafast superfast veryfast faster fast medium slow slower veryslow placebo ULTRAFAST SUPERFAST VERYFAST FASTER FAST MEDIUM SLOW SLOWER VERYSLOW PLACEBO"
+    video_preset=$(input_string "请输入压制视频的preset值" "默认preset值为medium" "允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写" "medium" "$video_preset_array_to_string" "(^$|^[a-zA-Z]{4,9}$)")
+    local delete_source_files
+    delete_source_files=$(input_bool "是否删除源文件" "默认是「即删除源文件」" "true")
 
-    draw_line "-"
-    echo "已开始本次的功能操作"
-    draw_line "~"
-    local operation_count=0
+    log_start
+    local operation_count=0 delete_count=0
     shopt -s nullglob
+    make_directory "$output_path"
     for file in *.mp4 *.flv *.mov *.MP4 *.FLV *.MOV; do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v 28 -preset:v medium -c:a copy "$output_path/${file%.*}.mp4"
-        draw_line "~"
+        draw_line_echo "~"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy "$output_path/${file%.*}.mp4"
         ((operation_count++))
+        echo
     done
+    if [ "$delete_source_files" = true ]; then
+        draw_line_echo "~"
+        for file in *.mp4 *.flv *.mov *.MP4 *.FLV *.MOV; do
+            rm -rf "$file"
+            ((delete_count++))
+            text_echo "当前已删除「$file」"
+        done
+        mv "$output_path"/* ./
+        rm -rf "$output_path"
+        draw_line_echo "~"
+        text_echo "已删除「$output_path」临时文件夹"
+        log_end "$operation_count" "$all_count" "$delete_count"
+        log_result "option_false" "file" "mp4"
+    else
+        log_end "$operation_count" "$all_count"
+        log_result "$feature_note"
+    fi
     shopt -u nullglob
-    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
-
-    finished_word "directory" "$output_path"
 }
