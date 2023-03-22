@@ -31,9 +31,9 @@ compress_video() {
     delete_source_files=$(input_bool "是否删除源文件" "默认是「即删除源文件」" "true")
 
     log_start
+    make_directory "$output_path"
     local operation_count=0 delete_count=0
     shopt -s nullglob
-    make_directory "$output_path"
     for file in *.mp4 *.flv *.mov *.MP4 *.FLV *.MOV; do
         draw_line_echo "~"
         ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy "$output_path/${file%.*}.mp4"

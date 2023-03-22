@@ -48,13 +48,13 @@ compress_images() {
         done
         for file in *.png *.PNG; do
             draw_line_echo "~"
-            ffmpeg_no_banner -i "$file" -vf "$(filter_effect_for_compress "png")" -pix_fmt pal8 "$output_path/${file%.*}.png"
+            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "$output_path/${file%.*}.png"
             ((operation_count++))
             echo
         done
         for file in *.gif *.GIF; do
             draw_line_echo "~"
-            ffmpeg_no_banner -i "$file" -vf "$(filter_effect_for_compress "gif")" "$output_path/${file%.*}.webp"
+            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "gif")" "$output_path/${file%.*}.webp"
             ((operation_count++))
             echo
         done
