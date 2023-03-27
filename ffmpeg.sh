@@ -8,73 +8,61 @@ while true; do
     clear
     draw_line_echo "="
     echo -e "FFmpeg批处理工具主菜单：\n"
-    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片（原格式压缩或者转换为webp格式）" "压缩视频，转换为hevc编码的mp4格式（libx265）" "重命名音频" "为音频添加封面图" "获取音频封面图" "webp格式转png格式（删除源文件）" "tga格式转png格式" "无损分割视频" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
+    options=("给图片添加版权水印并压缩" "合并视频和音频：mp4+m4a/mp3" "生成avc编码的mp4格式视频（libx264）" "压缩图片（原格式压缩或者转换为webp格式）" "压缩视频，转换为hevc编码的mp4格式（libx265）" "重命名音频" "处理音频封面图：获取、添加、删除" "图像转png格式" "无损分割视频" "flv格式转mp4格式" "显卡加速将图片序列合成为视频（不再维护该功能）" "退出程序")
     PS3=$'\n请选择菜单：'
     select option in "${options[@]}"; do
         case $option in
-        "tga格式转png格式")
+        "图像转png格式")
             while [ $? -ne 20 ]; do
-                tga_to_png
+                image2png
             done
             break
             ;;
         "无损分割视频")
             while [ $? -ne 20 ]; do
-                split_video
-            done
-            break
-            ;;
-        "webp格式转png格式（删除源文件）")
-            while [ $? -ne 20 ]; do
-                webp_to_png
+                video_split
             done
             break
             ;;
         "重命名音频")
             while [ $? -ne 20 ]; do
-                rename_audio
+                audio_rename
             done
             break
             ;;
-        "为音频添加封面图")
+        "处理音频封面图：获取、添加、删除")
             while [ $? -ne 20 ]; do
-                attach_image_to_audio
-            done
-            break
-            ;;
-        "获取音频封面图")
-            while [ $? -ne 20 ]; do
-                retrieve_audio_album
+                audio_cover
             done
             break
             ;;
         "生成avc编码的mp4格式视频（libx264）")
             while [ $? -ne 20 ]; do
-                make_video_with_libx264
+                video_using_libx264
             done
             break
             ;;
         "压缩视频，转换为hevc编码的mp4格式（libx265）")
             while [ $? -ne 20 ]; do
-                compress_video
+                video_compress
             done
             break
             ;;
         "flv格式转mp4格式")
             while [ $? -ne 20 ]; do
-                flv_to_mp4
+                flv2mp4
             done
             break
             ;;
         "合并视频和音频：mp4+m4a/mp3")
             while [ $? -ne 20 ]; do
-                merge_mp4_with_audio
+                mp4_merged_with_audio
             done
             break
             ;;
         "压缩图片（原格式压缩或者转换为webp格式）")
             while [ $? -ne 20 ]; do
-                compress_images
+                image_compress
             done
             break
             ;;
@@ -91,7 +79,7 @@ while true; do
             break
             ;;
         "退出程序")
-            break 2
+            break 3
             ;;
         *)
             echo -e "\n错误的选项，请重新选择菜单" >&2

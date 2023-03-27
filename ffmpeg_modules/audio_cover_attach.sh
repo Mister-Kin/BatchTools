@@ -46,8 +46,8 @@ check_image_good() {
     echo "${result_array[@]}"
 }
 
-audio_album_attach() {
-    local output_path="audio_album_attach"
+audio_cover_attach() {
+    local output_path="audio_cover_attach"
     local feature_name feature_intro feature_note
     feature_name="添加音频封面图"
     feature_intro="为mp3文件或者m4a文件或者flac文件添加封面图$(description_append_intro "手动选择封面图（有多张封面图且无音频同名的封面图）")"

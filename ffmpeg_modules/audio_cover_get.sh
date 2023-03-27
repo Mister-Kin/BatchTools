@@ -1,7 +1,7 @@
 #!/bin/bash
 
-audio_album_get() {
-    local output_path="audio_album_get"
+audio_cover_get() {
+    local output_path="audio_cover_get"
     local feature_name feature_intro feature_note
     feature_name="获取音频封面图"
     feature_intro="获取所有mp3文件或者m4a文件或者flac文件的音频封面图"

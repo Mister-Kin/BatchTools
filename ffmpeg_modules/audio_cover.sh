@@ -1,6 +1,6 @@
 #!/bin/bash
 
-audio_album() {
+audio_cover() {
     while true; do
         clear
         draw_line_echo "="
@@ -11,19 +11,19 @@ audio_album() {
             case $option in
             "获取音频封面图")
                 while [ $? -ne 20 ]; do
-                    audio_album_get
+                    audio_cover_get
                 done
                 break
                 ;;
             "添加音频封面图")
                 while [ $? -ne 20 ]; do
-                    audio_album_attach
+                    audio_cover_attach
                 done
                 break
                 ;;
             "删除音频封面图")
                 while [ $? -ne 20 ]; do
-                    audio_album_delete
+                    audio_cover_delete
                 done
                 break
                 ;;

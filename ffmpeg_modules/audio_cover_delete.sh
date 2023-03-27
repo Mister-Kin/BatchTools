@@ -1,7 +1,7 @@
 #!/bin/bash
 
-audio_album_delete() {
-    local output_path="audio_album_delete"
+audio_cover_delete() {
+    local output_path="audio_cover_delete"
     local feature_name feature_intro feature_note
     feature_name="删除音频封面图"
     feature_intro="删除所有mp3文件或者m4a文件或者flac文件的音频封面图"
