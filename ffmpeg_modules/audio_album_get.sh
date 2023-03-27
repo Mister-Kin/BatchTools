@@ -31,7 +31,7 @@ audio_album_get() {
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
         draw_line_echo "~"
         if [ "$media_stream_number" -eq 2 ]; then
-            ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/${file%.*}.png"
+            ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/$(get_file_name "$file").png"
             ((operation_count++))
             echo
         else
