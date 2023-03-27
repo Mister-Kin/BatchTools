@@ -11,15 +11,19 @@ input_bool() {
     user_input_default_value_hint="$2"
     user_input_hint="$1（$user_input_default_value_hint）："
     user_input_range_hint="允许输入「是/否/1/0/yes/no/y/n」，不区分大小写"
+    text_echo "提示：输入00并回车，则返回菜单" >&2
     text_echo "提示：不输入（等待15s）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
     if read -t 15 -r -p "$user_input_hint" user_input; then
-        while ! [[ "$user_input" =~ (^$|^[01]$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
+        while ! [[ "$user_input" =~ (^$|^00$|^[01]$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
             echo_text_echo_normal "当前输入错误，请重新输入。$user_input_range_hint。" >&2
             if ! read -t 15 -r -p "$user_input_hint" user_input; then
                 echo >&2
                 bool_value="$3"
             fi
         done
+        if [ "$user_input" = "00" ]; then
+            return 10
+        fi
         local regular_expr_true regular_expr_false
         if [ "$3" = true ]; then
             regular_expr_true="(^$|^1$|^[Yy]$|^[Yy][Ee][Ss]$)"
@@ -54,6 +58,7 @@ input_number() {
     user_input_default_value_hint="$2"
     user_input_hint="$1（$user_input_default_value_hint）："
     user_input_range_hint="$3"
+    text_echo "提示：输入00并回车，则返回菜单" >&2
     text_echo "提示：不输入（等待15s）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
     if read -t 15 -r -p "$user_input_hint" user_input; then
         while ! [[ "$user_input" =~ $5 ]]; do # 传递正则表达式参数，不用加双引号
@@ -63,6 +68,9 @@ input_number() {
                 number_value="$4"
             fi
         done
+        if [ "$user_input" = "00" ]; then
+            return 10
+        fi
         if [[ "$user_input" =~ ^$ ]]; then
             number_value="$4"
         else
@@ -92,6 +100,7 @@ input_string() {
     user_input_default_value_hint="$2"
     user_input_hint="$1（$user_input_default_value_hint）："
     user_input_range_hint="$3"
+    text_echo "提示：输入00并回车，则返回菜单" >&2
     text_echo "提示：不输入（等待15s）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
     if read -t 15 -r -p "$user_input_hint" user_input; then
         while ! [ $found_flag -eq 1 ] || ! [[ "$user_input" =~ $6 ]]; do
@@ -113,6 +122,9 @@ input_string() {
                 fi
             fi
         done
+        if [ "$user_input" = "00" ]; then
+            return 10
+        fi
     else
         echo >&2
         string_value="$4"

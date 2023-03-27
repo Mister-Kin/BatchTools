@@ -85,11 +85,11 @@ set_color() {
     fi
 }
 
-function lowercase_to_uppercase() {
+lowercase_to_uppercase() {
     echo "$1" | tr '[:lower:]' '[:upper:]'
 }
 
-function uppercase_to_lowercase() {
+uppercase_to_lowercase() {
     echo "$1" | tr '[:upper:]' '[:lower:]'
 }
 
@@ -178,10 +178,15 @@ log_start() {
 log_end() {
     local log_end_append=""
     if [ $# -eq 3 ]; then
-        log_end_append="，删除了$3个源文件"
+        if [[ "$3" =~ (^[1-9][0-9]*$) ]]; then
+            log_end_append="\n\n总共删除了$3个源文件"
+        else
+            log_end_append="\n\n$3"
+        fi
     fi
-    draw_line "~"
-    echo_text_echo "已结束本次的功能操作：总共执行了$1次操作（当前路径检测到$2个可操作文件）$log_end_append"
+    draw_line_echo "~"
+    echo -e "已结束本次的功能操作：\n\n总共执行了$1次操作（当前路径检测到$2个可操作文件）$log_end_append"
+    echo
 }
 
 log_result() {
@@ -196,4 +201,139 @@ log_result() {
     # 「cd ~-」回到上一工作路径，和「cd -」效果一样，但不会输出切换后的新路径到标准输出STDOUT中。如果cd失败就结束函数。
     cd ~- || return
     echo_text_normal "当前已切换回上一次的工作路径「$PWD」"
+}
+
+log_file_not_detected() {
+    local detected_text="$1文件"
+    if [ $# -ge 2 ]; then
+        detected_text+="、$2文件"
+        if [ $# -ge 3 ]; then
+            detected_text+="、$3文件"
+            if [ $# -ge 4 ]; then
+                detected_text+="、$4文件"
+                if [ $# -ge 5 ]; then
+                    detected_text+="、$5文件"
+                    if [ $# -ge 6 ]; then
+                        detected_text+="、$6文件"
+                    fi
+                fi
+            fi
+        fi
+    fi
+    draw_line "-"
+    echo_text "由于当前路径并未检测到任何$detected_text，已退出本次的功能操作"
+}
+
+# Renders a text based list of options that can be selected by the
+# user using up, down and enter keys and returns the chosen option.
+#   Arguments   : list of options, maximum of 256
+#                 "opt1" "opt2" ...
+#   Return value: selected index (0 for opt1, 1 for opt2 ...)
+arrow_select_option() {
+
+    # little helpers for terminal print control and key input
+    ESC=$(printf "\033")
+    cursor_blink_on() { printf "$ESC[?25h"; }
+    cursor_blink_off() { printf "$ESC[?25l"; }
+    cursor_to() { printf "$ESC[$1;${2:-1}H"; }
+    print_option() { printf "     $1"; }
+    print_selected() { printf "     $ESC[7m$1$ESC[27m"; }
+    get_cursor_row() {
+        IFS=';' read -sdR -p $'\E[6n' ROW COL
+        echo ${ROW#*[}
+    }
+    key_input() {
+        read -s -n3 key 2>/dev/null >&2
+        if [[ $key = $ESC[A ]]; then echo up; fi
+        if [[ $key = $ESC[B ]]; then echo down; fi
+        if [[ $key = "" ]]; then echo enter; fi
+    }
+
+    # initially print empty new lines (scroll down if at bottom of screen)
+    for opt; do printf "\n"; done
+
+    # determine current screen position for overwriting the options
+    local lastrow=$(get_cursor_row)
+    local startrow=$(($lastrow - $#))
+
+    # ensure cursor and input echoing back on upon a ctrl+c during read -s
+    trap "cursor_blink_on; stty echo; printf '\n'; exit" 2
+    cursor_blink_off
+
+    local selected=0
+    while true; do
+        # print options by overwriting the last lines
+        local idx=0
+        for opt; do
+            cursor_to $(($startrow + $idx))
+            if [ $idx -eq $selected ]; then
+                print_selected "$opt"
+            else
+                print_option "$opt"
+            fi
+            ((idx++))
+        done
+
+        # user key control
+        case $(key_input) in
+        enter) break ;;
+        up)
+            ((selected--))
+            if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi
+            ;;
+        down)
+            ((selected++))
+            if [ $selected -ge $# ]; then selected=0; fi
+            ;;
+        esac
+    done
+
+    # cursor position back to normal
+    cursor_to $lastrow
+    printf "\n"
+    cursor_blink_on
+
+    return $selected
+}
+
+file_extension_for_loop() {
+    local file_extension
+    file_extension="*.$(uppercase_to_lowercase "$1") *.$(lowercase_to_uppercase "$1")"
+    if [ $# -ge 2 ]; then
+        file_extension+=" *.$(uppercase_to_lowercase "$2") *.$(lowercase_to_uppercase "$2")"
+        if [ $# -ge 3 ]; then
+            file_extension+=" *.$(uppercase_to_lowercase "$3") *.$(lowercase_to_uppercase "$3")"
+            if [ $# -ge 4 ]; then
+                file_extension+=" *.$(uppercase_to_lowercase "$4") *.$(lowercase_to_uppercase "$4")"
+                if [ $# -ge 5 ]; then
+                    file_extension+=" *.$(uppercase_to_lowercase "$5") *.$(lowercase_to_uppercase "$5")"
+                fi
+            fi
+        fi
+    fi
+    echo "$file_extension"
+}
+
+remove_after_first_delimiter() {
+    echo "${1%%$2*}"
+}
+
+remove_after_last_delimiter() {
+    echo "${1%$2*}"
+}
+
+remove_before_first_delimiter() {
+    echo "${1#*$2}"
+}
+
+remove_before_last_delimiter() {
+    echo "${1##*$2}"
+}
+
+get_file_name() {
+    echo "$(remove_after_last_delimiter "$1" ".")"
+}
+
+get_file_extension() {
+    echo "$(remove_before_last_delimiter "$1" ".")"
 }

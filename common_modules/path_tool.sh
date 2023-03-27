@@ -18,7 +18,7 @@ detect_and_remove() {
 
 change_directory() {
     draw_line "-"
-    echo_text_echo "提示：输入0并回车，则返回主菜单"
+    echo_text_echo "提示：输入0并回车，则返回菜单"
     local path
     read -r -p "请输入文件夹路径并回车：" path
     if [ "$path" = "0" ]; then
@@ -80,25 +80,4 @@ file_count() {
         fi
     fi
     echo "$count"
-}
-
-file_not_detected() {
-    local detected_text="$1文件"
-    if [ $# -ge 2 ]; then
-        detected_text+="、$2文件"
-        if [ $# -ge 3 ]; then
-            detected_text+="、$3文件"
-            if [ $# -ge 4 ]; then
-                detected_text+="、$4文件"
-                if [ $# -ge 5 ]; then
-                    detected_text+="、$5文件"
-                    if [ $# -ge 6 ]; then
-                        detected_text+="、$6文件"
-                    fi
-                fi
-            fi
-        fi
-    fi
-    draw_line "-"
-    echo_text "由于当前路径并未检测到任何$detected_text，已退出本次的功能操作"
 }
