@@ -24,7 +24,7 @@ audio_cover_get() {
 
     log_start
     make_directory "$output_path"
-    local operation_count=0
+    local operation_count=0 no_cover_count=0
     shopt -s nullglob
     local media_stream_number
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
@@ -35,10 +35,15 @@ audio_cover_get() {
             ((operation_count++))
             echo
         else
-            text_echo "「$file」文件中没有图像，无法获取音频封面图"
+            text_echo "「$file」文件内部没有封面图，无法获取音频封面图"
+            ((no_cover_count++))
         fi
     done
-    log_end "$operation_count" "$all_count"
+    if [ "$no_cover_count" -eq 0 ]; then
+        log_end "$operation_count" "$all_count"
+    else
+        log_end "$operation_count" "$all_count" "有$no_cover_count个音频文件内部没有封面图，无法获取音频封面图"
+    fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob
 }
