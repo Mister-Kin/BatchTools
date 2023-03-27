@@ -29,13 +29,12 @@ audio_cover_delete() {
     local media_stream_number
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
-        draw_line_echo "~"
         if [ "$media_stream_number" -eq 2 ]; then
             # -map 0 选择所有流；-map -0:v 选择音频（-0:v加负号是取消选择视频流，即反选）
             ffmpeg_no_banner -i "$file" -map 0 -map -0:v -c copy "$output_path/$file"
             ((operation_count++))
-            echo
         else
+            draw_line_echo "~"
             text_echo "「$file」文件内部没有封面图，无需进行删除音频封面图操作"
             ((no_cover_count++))
         fi

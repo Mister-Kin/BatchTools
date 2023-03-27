@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ffmpeg_no_banner() {
-    ffmpeg -hide_banner "$@"
+    ffmpeg -hide_banner -loglevel error "$@"
 }
 
 copyright_watermark() {
@@ -34,5 +34,5 @@ filter_for_compress_with_copyright() {
 }
 
 get_media_info() {
-    echo $(ffprobe -loglevel error -show_entries "$2" -of default=noprint_wrappers=1:nokey=1 "$1")
+    echo $(ffprobe -hide_banner -loglevel error -show_entries "$2" -of default=noprint_wrappers=1:nokey=1 "$1")
 }

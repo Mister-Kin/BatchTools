@@ -37,10 +37,8 @@ audio_rename_to_file() {
             text_echo "「$file」内部没有元数据标签，无法完成重命名文件操作"
             ((no_metadate_count++))
         else
-            draw_line_echo "~"
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$output_file"
             ((operation_count++))
-            echo
             draw_line_echo "~"
             text_echo "已将「$file」重命名为「$output_file」"
         fi

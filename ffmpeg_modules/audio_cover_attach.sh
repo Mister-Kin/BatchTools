@@ -26,13 +26,9 @@ check_image_good() {
         text_echo "本程序将自动压缩封面图「$1」，生成临时文件再添加音频封面图" >&2
         file_extension=$(uppercase_to_lowercase $(get_file_extension "$1"))
         if [ "$file_extension" = "png" ]; then
-            draw_line_echo "~" >&2
             ffmpeg_no_banner -i "$1" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "image_temp.png" >&2
-            echo >&2
         else
-            draw_line_echo "~" >&2
             ffmpeg_no_banner -i "$1" "image_temp.jpg" >&2
-            echo >&2
         fi
         image_file_size=$(get_media_info "image_temp.$file_extension" "format=size")
         image_file_size_to_kilo=$(echo $image_file_size | awk '{ printf "%.2f", $1 / 1024 }')
@@ -92,10 +88,8 @@ audio_cover_attach() {
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                draw_line_echo "~"
                 ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
                 ((operation_count++))
-                echo
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
                     draw_line_echo "~"
@@ -119,10 +113,8 @@ audio_cover_attach() {
                     if [ "${check_image_flag[1]}" = false ]; then
                         ((bad_resolution_count++))
                     fi
-                    draw_line_echo "~"
                     ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
                     ((operation_count++))
-                    echo
                     if [ "${check_image_flag[0]}" = false ]; then
                         rm -rf "${check_image_flag[2]}"
                         draw_line_echo "~"
@@ -165,10 +157,8 @@ audio_cover_attach() {
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                draw_line_echo "~"
                 ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
                 ((operation_count++))
-                echo
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
                     draw_line_echo "~"

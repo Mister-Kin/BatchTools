@@ -32,10 +32,8 @@ audio_rename_to_metadata() {
         if [[ "$file_name" == *" - "* ]]; then
             audio_title=$(remove_after_last_delimiter "$file_name" " - ")
             audio_artist=$(remove_before_last_delimiter "$file_name" " - ")
-            draw_line_echo "~"
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_title" -metadata artist="$audio_artist" "$output_path/$file"
             ((operation_count++))
-            echo
             draw_line_echo "~"
             text_echo "已完成修改「$file」文件内部元数据标签"
         else

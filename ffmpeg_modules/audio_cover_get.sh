@@ -29,12 +29,11 @@ audio_cover_get() {
     local media_stream_number
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
-        draw_line_echo "~"
         if [ "$media_stream_number" -eq 2 ]; then
             ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/$(get_file_name "$file").png"
             ((operation_count++))
-            echo
         else
+            draw_line_echo "~"
             text_echo "「$file」文件内部没有封面图，无法获取音频封面图"
             ((no_cover_count++))
         fi
