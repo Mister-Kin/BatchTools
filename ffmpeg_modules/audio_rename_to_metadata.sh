@@ -5,7 +5,7 @@ audio_rename_to_metadata() {
     local feature_name feature_intro feature_note
     feature_name="根据元数据标签重命名音频文件"
     feature_intro="根据音频文件内部的元数据标签（metadata tag），重命名所有mp3文件或者m4a文件或者flac文件"
-    feature_note="$(set_color "blue" "文件名要求：「歌曲名 - 歌手名」，歌名在前，歌手在后，短杠分割，短杠左右均有一个空格")；$(description_append_note "option_false" "directory" "$output_path")"
+    feature_note="$(set_color "blue" "文件名要求：「歌曲名 - 歌手名」，歌名在前，歌手在后，短杠分割，短杠前后均有一个空格")；$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
     if [ $? -eq 10 ]; then
