@@ -85,10 +85,22 @@ audio_album_attach() {
     if [ "$image_all_count" -eq 1 ]; then
         for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
             for image_file in $(file_extension_for_loop "png" "jpg"); do
+                check_image_flag=($(check_image_good "$image_file"))
+                if [ "${check_image_flag[0]}" = false ]; then
+                    image_file="${check_image_flag[2]}"
+                fi
+                if [ "${check_image_flag[1]}" = false ]; then
+                    ((bad_resolution_count++))
+                fi
                 draw_line_echo "~"
                 ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
                 ((operation_count++))
                 echo
+                if [ "${check_image_flag[0]}" = false ]; then
+                    rm -rf "${check_image_flag[2]}"
+                    draw_line_echo "~"
+                    text_echo "已删除临时文件「${check_image_flag[2]}」"
+                fi
             done
         done
     fi
@@ -100,10 +112,22 @@ audio_album_attach() {
                 image_file_name=$(get_file_name "$image_file")
                 if [ "$file_name" = "$image_file_name" ]; then
                     check_name_flag=true
+                    check_image_flag=($(check_image_good "$image_file"))
+                    if [ "${check_image_flag[0]}" = false ]; then
+                        image_file="${check_image_flag[2]}"
+                    fi
+                    if [ "${check_image_flag[1]}" = false ]; then
+                        ((bad_resolution_count++))
+                    fi
                     draw_line_echo "~"
                     ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
                     ((operation_count++))
                     echo
+                    if [ "${check_image_flag[0]}" = false ]; then
+                        rm -rf "${check_image_flag[2]}"
+                        draw_line_echo "~"
+                        text_echo "已删除临时文件「${check_image_flag[2]}」"
+                    fi
                     break
                 else
                     check_name_flag=false
