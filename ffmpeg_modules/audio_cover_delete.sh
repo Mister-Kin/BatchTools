@@ -4,7 +4,7 @@ audio_cover_delete() {
     local output_path="audio_cover_delete"
     local feature_name feature_intro feature_note
     feature_name="删除音频封面图"
-    feature_intro="删除所有mp3文件或者m4a文件或者flac文件的音频封面图"
+    feature_intro="删除路径下的mp3文件或者m4a文件或者flac文件的音频封面图"
     feature_note="$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -27,6 +27,7 @@ audio_cover_delete() {
     local operation_count=0 no_cover_count=0
     shopt -s nullglob
     local media_stream_number
+    draw_line_echo "~"
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
         if [ "$media_stream_number" -eq 2 ]; then
@@ -38,6 +39,7 @@ audio_cover_delete() {
             text_echo "「$file」文件内部没有封面图，无需进行删除音频封面图操作"
             ((no_cover_count++))
         fi
+        show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))
     done
     if [ "$no_cover_count" -eq 0 ]; then
         log_end "$operation_count" "$all_count"

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-audio_rename_to_file() {
-    local output_path="audio_rename_to_file"
+audio_rename_file() {
+    local output_path="audio_rename_file"
     local feature_name feature_intro feature_note
-    feature_name="根据元数据标签重命名音频文件"
-    feature_intro="根据音频文件内部的元数据标签（metadata tag），重命名所有mp3文件或者m4a文件或者flac文件"
+    feature_name="重命名音频文件"
+    feature_intro="根据音频文件内部的元数据标签（metadata tag），重命名路径下的mp3文件或者m4a文件或者flac文件"
     feature_note="$(set_color "blue" "命名格式：「歌曲名 - 歌手名」")；$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -27,6 +27,7 @@ audio_rename_to_file() {
     local operation_count=0 no_metadate_count=0
     shopt -s nullglob
     local audio_title audio_artist output_file
+    draw_line_echo "~"
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         # nokey格式的输出可以通过设置nokey=1来去除每个字段的键名，只保留值。
         audio_title=$(get_media_info "$file" "format_tags=title")
@@ -39,9 +40,8 @@ audio_rename_to_file() {
         else
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$output_file"
             ((operation_count++))
-            draw_line_echo "~"
-            text_echo "已将「$file」重命名为「$output_file」"
         fi
+        show_progress_bar "$all_count" $(("$operation_count" + "$no_metadate_count"))
     done
     if [ "$no_metadate_count" -eq 0 ]; then
         log_end "$operation_count" "$all_count"

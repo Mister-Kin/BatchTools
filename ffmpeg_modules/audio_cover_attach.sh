@@ -21,7 +21,7 @@ check_image_good() {
         file_size_flag=false
         draw_line_echo "~" >&2
         local image_file_size_to_mega
-        image_file_size_to_mega=$(echo $image_file_size | awk '{ printf "%.2f", $1 / 1024 /1024 }')
+        image_file_size_to_mega=$(echo $image_file_size | gawk '{ printf "%.2f", $1 / 1024 /1024 }')
         text_echo "当前选择的封面图「$1」文件大小为${image_file_size_to_mega}MB，已超过1MB" >&2
         text_echo "本程序将自动压缩封面图「$1」，生成临时文件再添加音频封面图" >&2
         file_extension=$(uppercase_to_lowercase $(get_file_extension "$1"))
@@ -46,7 +46,7 @@ audio_cover_attach() {
     local output_path="audio_cover_attach"
     local feature_name feature_intro feature_note
     feature_name="添加音频封面图"
-    feature_intro="为mp3文件或者m4a文件或者flac文件添加封面图$(description_append_intro "手动选择封面图（有多张封面图且无音频同名的封面图）")"
+    feature_intro="为路径下的mp3文件或者m4a文件或者flac文件添加封面图$(description_append_intro "手动选择封面图（有多张封面图且无音频同名的封面图）")"
     feature_note="$(set_color "blue")封面图要求png格式或者jpg格式；封面图分辨率建议不低于300×300px，推荐为960×960px；建议封面图宽高比为1，否则生成的封面图非正方形；建议封面图大小不超过1MB，否则本程序会自动将超过1MB的图片进行压缩后再进行添加音频封面图；$(set_color "reset")$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -78,6 +78,7 @@ audio_cover_attach() {
     local operation_count=0 bad_resolution_count=0
     shopt -s nullglob
     local -a check_image_flag
+    draw_line_echo "~"
     if [ "$image_all_count" -eq 1 ]; then
         for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
             for image_file in $(file_extension_for_loop "png" "jpg"); do
@@ -94,8 +95,10 @@ audio_cover_attach() {
                     rm -rf "${check_image_flag[2]}"
                     draw_line_echo "~"
                     text_echo "已删除临时文件「${check_image_flag[2]}」"
+                    draw_line_echo "~"
                 fi
             done
+            show_progress_bar "$audio_all_count" "$operation_count"
         done
     fi
     if [ "$image_all_count" -gt 1 ]; then
@@ -119,6 +122,7 @@ audio_cover_attach() {
                         rm -rf "${check_image_flag[2]}"
                         draw_line_echo "~"
                         text_echo "已删除临时文件「${check_image_flag[2]}」"
+                        draw_line_echo "~"
                     fi
                     break
                 else
@@ -163,8 +167,10 @@ audio_cover_attach() {
                     rm -rf "${check_image_flag[2]}"
                     draw_line_echo "~"
                     text_echo "已删除临时文件「${check_image_flag[2]}」"
+                    draw_line_echo "~"
                 fi
             fi
+            show_progress_bar "$audio_all_count" "$operation_count"
         done
     fi
     if [ "$bad_resolution_count" -eq 0 ]; then
