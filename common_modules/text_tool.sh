@@ -337,3 +337,29 @@ get_file_name() {
 get_file_extension() {
     echo "$(remove_before_last_delimiter "$1" ".")"
 }
+
+show_progress_bar() {
+    local current total bar_size bar_char_done bar_char_todo percent done_num todo_num done_sub_bar todo_sub_bar
+    total="$1"
+    current="$2"
+
+    bar_size=$(($(tput cols) - 25))
+    bar_char_done="#"
+    bar_char_todo="-"
+    # calculate the progress in percentage
+    percent=$(echo $current $total | gawk '{ printf "%.2f", $1 / $2 * 100 }')
+    # The number of done and todo characters
+    done_num=$(echo $bar_size $percent | gawk '{ printf "%.0f", $1 * $2 / 100 }')
+    todo_num=$(echo $bar_size $done_num | gawk '{ printf "%.0f", $1 - $2 }')
+
+    # build the done and todo sub-bars
+    done_sub_bar=$(printf "%${done_num}s" | tr " " "${bar_char_done}")
+    todo_sub_bar=$(printf "%${todo_num}s" | tr " " "${bar_char_todo}")
+
+    # output the bar
+    echo -ne "\r当前处理进度：[${done_sub_bar}${todo_sub_bar}] ${percent}%"
+
+    if [ $total -eq $current ]; then
+        echo -e "\n"
+    fi
+}
