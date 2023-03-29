@@ -21,6 +21,9 @@ audio_converter_wav2m4a() {
 
     local audio_bitrate
     audio_bitrate=$(input_number "请输入压制音频的码率" "默认码率为192k" "允许输入「16/32/64/96/128/192/256/320」，程序会自动设置单位为k" "192" "(^$|^00$|^16$|^32$|^64$|^96$|^128$|^192$|^256$|^320$)")
+    if [ $? -eq 10 ]; then
+        return 20
+    fi
     audio_bitrate="${audio_bitrate}k"
 
     draw_line_echo "~"
