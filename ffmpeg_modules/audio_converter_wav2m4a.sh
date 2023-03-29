@@ -4,7 +4,7 @@ audio_converter_wav2m4a() {
     local output_path="audio_converter_wav2m4a"
     local feature_name feature_intro feature_note
     feature_name="wav格式转m4a格式"
-    feature_intro="将路径下的wav文件重新压制为m4a文件，音频编码采用aac（libfdk_aac）$(description_append_intro "压制音频的码率")"
+    feature_intro="将路径下的wav文件重新压制为m4a文件，音频编码采用aac（libfdk_aac）$(description_append_intro "设置压制音频的码率")"
     feature_note="$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -36,7 +36,6 @@ audio_converter_wav2m4a() {
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done
-
     log_end "$operation_count" "$all_count"
     log_result "$feature_note"
     shopt -u nullglob
