@@ -18,7 +18,7 @@ compress_media_video() {
     mov_count=$(file_count "mov")
     all_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
     if [ "$all_count" -eq 0 ]; then
-        file_not_detected "mp4" "flv" "mov"
+        log_file_not_detected "mp4" "flv" "mov"
         return 0
     fi
 

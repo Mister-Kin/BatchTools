@@ -18,7 +18,7 @@ compress_media_image() {
     gif_count=$(file_count "gif")
     all_count=$(("$png_count" + "$jpg_count" + "$jpeg_count" + "$gif_count"))
     if [ "$all_count" -eq 0 ]; then
-        file_not_detected "png" "jpg" "jpeg" "gif"
+        log_file_not_detected "png" "jpg" "jpeg" "gif"
         return 0
     fi
 

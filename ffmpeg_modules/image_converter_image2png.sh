@@ -1,39 +1,57 @@
 #!/bin/bash
 
-tga_to_png() {
-    description "tga格式转png格式" "将所有tga文件转换成png格式；生成的文件输出在「tga_to_png_output」文件夹" "确保路径下没有名为「tga_to_png_output」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+image_converter_image2png() {
+    local output_path="image_converter_image2png"
+    local feature_name feature_intro feature_note
+    feature_name="图片转png格式"
+    feature_intro="将路径下的webp文件或者jpg文件或者jpeg文件或者gif文件或者tga文件转换成png格式$(description_append_intro "是否删除源文件")"
+    feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "image2png")"
+    description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
     if [ $? -eq 10 ]; then
         return 20
     fi
 
-    local tga_count TGA_count all_count
-    tga_count=$(file_count "tga")
-    TGA_count=$(file_count "TGA")
-    all_count=$(("$tga_count" + "$TGA_count"))
-    if [ "$tga_count" -eq 0 ] && [ "$TGA_count" -eq 0 ]; then
-        echo "当前并未检测到tga文件和TGA文件，已退出本次的功能操作"
+    local all_count tga jpg_count jpeg_count gif_count webp_count
+    tga=$(file_count "tga")
+    jpg_count=$(file_count "jpg")
+    jpeg_count=$(file_count "jpeg")
+    gif_count=$(file_count "gif")
+    webp_count=$(file_count "webp")
+    all_count=$(("$tga" + "$jpg_count" + "$jpeg_count" + "$gif_count" + "$webp_count"))
+    if [ "$all_count" -eq 0 ]; then
+        log_file_not_detected "tga" "jpg" "jpeg" "gif" "webp"
         return 0
     fi
-    if [ "$tga_count" -gt 0 ] || [ "$TGA_count" -gt 0 ]; then
-        echo "当前检测到$tga_count个tga文件和$TGA_count个TGA文件"
+
+    local delete_source_files
+    delete_source_files=$(input_bool "是否删除源文件" "默认是「即删除源文件」" "true")
+    if [ $? -eq 10 ]; then
+        return 20
     fi
 
-    local output_path="tga_to_png_output"
+    log_start
     make_directory "$output_path"
-
-    draw_line "-"
-    echo "已开始本次的功能操作"
-    draw_line "~"
     local operation_count=0
     shopt -s nullglob
-    for file in *.tga *.TGA; do
+    draw_line_echo "~"
+    for file in $(file_extension_for_loop "tga" "jpg" "jpeg" "gif" "webp"); do
         ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.png"
-        draw_line "~"
         ((operation_count++))
+        show_progress_bar "$all_count" "$operation_count"
     done
+    if [ "$delete_source_files" = true ]; then
+        for file in $(file_extension_for_loop "tga" "jpg" "jpeg" "gif" "webp"); do
+            rm -rf "$file"
+            ((delete_count++))
+        done
+        mv "$output_path"/* ./
+        rm -rf "$output_path"
+        log_end "$operation_count" "$all_count" "$delete_count"
+        log_result "option_false" "file" "png"
+    else
+        log_end "$operation_count" "$all_count"
+        log_result "$feature_note"
+    fi
     shopt -u nullglob
-    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件，其中$tga_count个tga文件和$TGA_count个TGA文件）"
-
-    finished_word "directory" "$output_path"
 }
