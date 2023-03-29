@@ -20,13 +20,13 @@ change_directory() {
     draw_line "-"
     echo_text_echo "提示：输入0并回车，则返回菜单"
     local path
-    read -r -p "请输入文件夹路径并回车：" path
+    read -e -r -p "请输入文件夹路径并回车：" path
     if [ "$path" = "0" ]; then
         return 10
     fi
     while ! cd "$path" 2>/dev/null || [ "$path" = "" ]; do
         echo
-        read -r -p "当前输入路径不存在，请重新输入文件夹路径并回车：" path
+        read -e -r -p "当前输入路径不存在，请重新输入文件夹路径并回车：" path
         if [ "$path" = "0" ]; then
             return 10
         fi
