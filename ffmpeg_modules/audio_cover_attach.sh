@@ -11,19 +11,19 @@ check_image_good() {
         image_resolution_flag=true
     else
         image_resolution_flag=false
-        draw_line_echo "~" >&2
-        text_echo "当前选择的封面图「$1」宽高比不为1" >&2
-        text_echo "这会导致生成的音频封面图非正方形" >&2
+        # draw_line_echo "~" >&2
+        # text_echo "当前选择的封面图「$1」宽高比不为1" >&2
+        # text_echo "这会导致生成的音频封面图非正方形" >&2
     fi
     if [ "$image_file_size" -lt "$mega_byte" ]; then
         file_size_flag=true
     else
         file_size_flag=false
-        draw_line_echo "~" >&2
         local image_file_size_to_mega
         image_file_size_to_mega=$(echo $image_file_size | gawk '{ printf "%.2f", $1 / 1024 /1024 }')
-        text_echo "当前选择的封面图「$1」文件大小为${image_file_size_to_mega}MB，已超过1MB" >&2
-        text_echo "本程序将自动压缩封面图「$1」，生成临时文件再添加音频封面图" >&2
+        # draw_line_echo "~" >&2
+        # text_echo "当前选择的封面图「$1」文件大小为${image_file_size_to_mega}MB，已超过1MB" >&2
+        # text_echo "本程序将自动压缩封面图「$1」，生成临时文件再添加音频封面图" >&2
         file_extension=$(uppercase_to_lowercase $(get_file_extension "$1"))
         if [ "$file_extension" = "png" ]; then
             ffmpeg_no_banner -i "$1" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "image_temp.png" >&2
@@ -32,9 +32,9 @@ check_image_good() {
         fi
         image_file_size=$(get_media_info "image_temp.$file_extension" "format=size")
         image_file_size_to_kilo=$(echo $image_file_size | awk '{ printf "%.2f", $1 / 1024 }')
-        draw_line_echo "~" >&2
-        text_echo "已生成临时文件「image_temp.$file_extension」，文件大小为${image_file_size_to_kilo}KB" >&2
-        text_echo "已完成压缩「$1」，从${image_file_size_to_mega}MB压缩到${image_file_size_to_kilo}KB" >&2
+        # draw_line_echo "~" >&2
+        # text_echo "已生成临时文件「image_temp.$file_extension」，文件大小为${image_file_size_to_kilo}KB" >&2
+        # text_echo "已完成压缩「$1」，从${image_file_size_to_mega}MB压缩到${image_file_size_to_kilo}KB" >&2
     fi
     result_array+=("$file_size_flag")
     result_array+=("$image_resolution_flag")
@@ -89,13 +89,13 @@ audio_cover_attach() {
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
+                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
                 ((operation_count++))
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
-                    draw_line_echo "~"
-                    text_echo "已删除临时文件「${check_image_flag[2]}」"
-                    draw_line_echo "~"
+                    # draw_line_echo "~"
+                    # text_echo "已删除临时文件「${check_image_flag[2]}」"
+                    # draw_line_echo "~"
                 fi
             done
             show_progress_bar "$audio_all_count" "$operation_count"
@@ -116,13 +116,13 @@ audio_cover_attach() {
                     if [ "${check_image_flag[1]}" = false ]; then
                         ((bad_resolution_count++))
                     fi
-                    ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
+                    ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
                     ((operation_count++))
                     if [ "${check_image_flag[0]}" = false ]; then
                         rm -rf "${check_image_flag[2]}"
-                        draw_line_echo "~"
-                        text_echo "已删除临时文件「${check_image_flag[2]}」"
-                        draw_line_echo "~"
+                        # draw_line_echo "~"
+                        # text_echo "已删除临时文件「${check_image_flag[2]}」"
+                        # draw_line_echo "~"
                     fi
                     break
                 else
@@ -161,13 +161,13 @@ audio_cover_attach() {
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -map_chapters -1 -disposition:v:0 attached_pic "$output_path/$file"
+                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
                 ((operation_count++))
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
-                    draw_line_echo "~"
-                    text_echo "已删除临时文件「${check_image_flag[2]}」"
-                    draw_line_echo "~"
+                    # draw_line_echo "~"
+                    # text_echo "已删除临时文件「${check_image_flag[2]}」"
+                    # draw_line_echo "~"
                 fi
             fi
             show_progress_bar "$audio_all_count" "$operation_count"

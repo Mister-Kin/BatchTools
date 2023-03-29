@@ -34,8 +34,8 @@ audio_cover_get() {
             ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/$(get_file_name "$file").png"
             ((operation_count++))
         else
-            draw_line_echo "~"
-            text_echo "「$file」文件内部没有封面图，无法获取音频封面图"
+            # draw_line_echo "~"
+            # text_echo "「$file」文件内部没有封面图，无法获取音频封面图"
             ((no_cover_count++))
         fi
         show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))

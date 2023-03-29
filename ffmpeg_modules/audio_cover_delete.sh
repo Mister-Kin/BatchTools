@@ -35,8 +35,8 @@ audio_cover_delete() {
             ffmpeg_no_banner -i "$file" -map 0 -map -0:v -c copy "$output_path/$file"
             ((operation_count++))
         else
-            draw_line_echo "~"
-            text_echo "「$file」文件内部没有封面图，无需进行删除音频封面图操作"
+            # draw_line_echo "~"
+            # text_echo "「$file」文件内部没有封面图，无需进行删除音频封面图操作"
             ((no_cover_count++))
         fi
         show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))

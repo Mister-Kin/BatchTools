@@ -36,8 +36,8 @@ audio_metadata_by_file_name() {
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_title" -metadata artist="$audio_artist" "$output_path/$file"
             ((operation_count++))
         else
-            draw_line_echo "~"
-            text_echo "「$file」文件名格式不符合要求，无法修改内部元数据标签"
+            # draw_line_echo "~"
+            # text_echo "「$file」文件名格式不符合要求，无法修改内部元数据标签"
             ((no_good_name_count++))
         fi
         show_progress_bar "$all_count" $(("$operation_count" + "$no_good_name_count"))

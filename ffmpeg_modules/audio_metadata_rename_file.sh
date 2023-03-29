@@ -1,9 +1,9 @@
 #!/bin/bash
 
-audio_rename_file() {
-    local output_path="audio_rename_file"
+audio_metadata_rename_file() {
+    local output_path="audio_metadata_rename_file"
     local feature_name feature_intro feature_note
-    feature_name="重命名音频文件"
+    feature_name="根据元数据标签重命名音频文件"
     feature_intro="根据音频文件内部的元数据标签（metadata tag），重命名路径下的mp3文件或者m4a文件或者flac文件"
     feature_note="$(set_color "blue" "命名格式：「歌曲名 - 歌手名」")；$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
@@ -34,8 +34,8 @@ audio_rename_file() {
         audio_artist=$(get_media_info "$file" "format_tags=artist")
         output_file="$audio_title - $audio_artist.$(get_file_extension "$file")"
         if [ "$audio_title" = "" ] || [ "$audio_artist" = "" ]; then
-            draw_line_echo "~"
-            text_echo "「$file」内部没有元数据标签，无法完成重命名文件操作"
+            # draw_line_echo "~"
+            # text_echo "「$file」内部没有元数据标签，无法完成重命名文件操作"
             ((no_metadate_count++))
         else
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$output_file"
