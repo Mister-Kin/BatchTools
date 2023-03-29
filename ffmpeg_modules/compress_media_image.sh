@@ -61,7 +61,7 @@ compress_media_image() {
         make_directory "$output_path"
         draw_line_echo "~"
         for file in $(file_extension_for_loop "png" "jpg" "jpeg" "gif"); do
-            ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.webp"
+            ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").webp"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done

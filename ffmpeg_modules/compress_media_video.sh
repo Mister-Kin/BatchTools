@@ -45,7 +45,7 @@ compress_media_video() {
     shopt -s nullglob
     draw_line_echo "~"
     for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy "$output_path/${file%.*}.mp4"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy "$output_path/$(get_file_name "$file").mp4"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

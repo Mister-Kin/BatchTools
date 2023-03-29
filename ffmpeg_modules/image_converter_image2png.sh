@@ -36,7 +36,7 @@ image_converter_image2png() {
     shopt -s nullglob
     draw_line_echo "~"
     for file in $(file_extension_for_loop "tga" "jpg" "jpeg" "gif" "webp"); do
-        ffmpeg_no_banner -i "$file" "$output_path/${file%.*}.png"
+        ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").png"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done
