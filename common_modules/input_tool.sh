@@ -132,3 +132,24 @@ input_string() {
     echo >&2
     echo "$string_value"
 }
+
+# 函数: input_anything，处理用户的任意输入，需要输入一个参数
+# 参数1：提示用户输入的信息，如「请输入压制视频的crf值」
+input_anything() {
+    draw_line_echo "-" >&2
+    local user_input user_input_hint
+    local anthing_value
+    user_input_hint="$1："
+    text_echo "提示：输入00并回车，则返回菜单" >&2
+    read -r -p "$user_input_hint" user_input
+    while [[ "$user_input" =~ (^$) ]]; do # 传递正则表达式参数，不用加双引号
+        echo_text_echo_normal "当前输入为空，请重新输入。$user_input_range_hint。" >&2
+        read -r -p "$user_input_hint" user_input
+    done
+    if [ "$user_input" = "00" ]; then
+        return 10
+    fi
+    anthing_value="$user_input"
+    echo >&2
+    echo "$anthing_value"
+}
