@@ -338,6 +338,11 @@ get_file_extension() {
     echo "$(remove_before_last_delimiter "$1" ".")"
 }
 
+lowercase_file_name_extension() {
+    local file="$1"
+    echo "$(get_file_name "$file").$(uppercase_to_lowercase "$(get_file_extension "$file")")"
+}
+
 show_progress_bar() {
     local current total bar_size bar_char_done bar_char_todo percent done_num todo_num done_sub_bar todo_sub_bar
     total="$1"
