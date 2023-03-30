@@ -63,12 +63,12 @@ personal_work_encode_video() {
     fi
 
     local watermark_flag
-    watermark_flag=$(input_bool "是否添加版权文字水印" "默认是「即不默认添加版权文字水印」" "false")
+    watermark_flag=$(input_bool "是否添加版权文字水印" "默认否「即不默认添加版权文字水印」" "false")
     if [ $? -eq 10 ]; then
         return 20
     fi
 
-    draw_line_echo "~"
+    draw_line_echo "-"
     if [ "$encode_audio_flag" = true ]; then
         text_echo "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」，设置添加版权文字水印为「$watermark_flag」"
     else

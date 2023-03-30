@@ -26,7 +26,7 @@ audio_converter_wav2m4a() {
     fi
     audio_bitrate="${audio_bitrate}k"
 
-    draw_line_echo "~"
+    draw_line_echo "-"
     text_echo "当前已设置压制音频的码率为「$audio_bitrate」"
 
     log_start

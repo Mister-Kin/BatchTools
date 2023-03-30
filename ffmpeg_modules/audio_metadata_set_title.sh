@@ -64,7 +64,7 @@ audio_metadata_set_title() {
     if [ $? -eq 10 ]; then
         return 20
     fi
-    draw_line_echo "~"
+    draw_line_echo "-"
     text_echo "当前已设置元数据标签-歌曲名为「$audio_title」"
 
     ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_title" "$output_path/$file"

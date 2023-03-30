@@ -30,7 +30,7 @@ image_converter_image2png() {
         return 20
     fi
 
-    draw_line_echo "~"
+    draw_line_echo "-"
     text_echo "当前已设置删除源文件为「$delete_source_files」"
 
     log_start

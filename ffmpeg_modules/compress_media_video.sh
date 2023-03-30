@@ -39,7 +39,7 @@ compress_media_video() {
         return 20
     fi
 
-    draw_line_echo "~"
+    draw_line_echo "-"
     text_echo "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的preset值为「$video_preset」，设置删除源文件为「$delete_source_files」"
 
     log_start

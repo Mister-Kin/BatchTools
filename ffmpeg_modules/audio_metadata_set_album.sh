@@ -28,7 +28,7 @@ audio_metadata_set_album() {
         return 20
     fi
 
-    draw_line_echo "~"
+    draw_line_echo "-"
     text_echo "当前已设置元数据标签-专辑名为「$audio_ablum」"
 
     log_start
