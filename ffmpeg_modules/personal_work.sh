@@ -2,9 +2,10 @@
 
 personal_work() {
     local -a menu_options_array
-    menu_options_array+=("重编码视频导出mp4格式视频（libx264）")
-    menu_options_array+=("图片序列导出mp4格式视频（libx264）")
     menu_options_array+=("给图片添加版权水印并压缩")
+    menu_options_array+=("图片序列导出mp4格式视频（libx264）")
+    menu_options_array+=("重编码视频导出mp4格式视频（libx264）")
+    menu_options_array+=("添加字幕（硬编码，libx264）")
     menu_options_array+=("退出子菜单")
     while true; do
         clear
@@ -15,6 +16,11 @@ personal_work() {
         arrow_select_option "${menu_options_array[@]}"
         local choice=$?
         case ${menu_options_array[$choice]} in
+        "添加字幕（硬编码，libx264）")
+            while [ $? -ne 20 ]; do
+                personal_work_add_subtitle
+            done
+            ;;
         "重编码视频导出mp4格式视频（libx264）")
             while [ $? -ne 20 ]; do
                 personal_work_encode_video
