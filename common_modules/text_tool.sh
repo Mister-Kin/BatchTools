@@ -314,6 +314,25 @@ file_extension_for_loop() {
     echo "$file_extension"
 }
 
+# 获取最后一个字符
+get_last_char() {
+    echo "${1: -1}"
+}
+
+# 删除最后一个字符
+remove_last_char() {
+    echo "${1::-1}"
+}
+
+# 删除最后任意个字符
+remove_last_any_char() {
+    echo "${1::-$2}"
+}
+
+get_string_length() {
+    echo "${#1}"
+}
+
 remove_after_first_delimiter() {
     echo "${1%%$2*}"
 }
