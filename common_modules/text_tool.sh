@@ -112,7 +112,7 @@ description_append_intro() {
 }
 
 # 函数: description_append_note，补充description函数的注意事项小节
-# 参数1：如果结果不确定，如可能输出在这个文件夹或者其他文件夹中。确定结果：option_false；不确定结果：eoption_true
+# 参数1：如果结果不确定，如可能输出在这个文件夹或者其他文件夹中。确定结果：option_false；不确定结果：option_true
 # 参数2：设置文件或者文件夹。file/directory
 # 参数3：如果操作中会创建文件夹，并且有删除源文件的选项。设置为directory_delete_option。没有删除源文件选项就不用设置此项，缺省设置为文件或者文件夹的正常名称。
 # 参数4-参数8：文件或者文件夹的名称。
