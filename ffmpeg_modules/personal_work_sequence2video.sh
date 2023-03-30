@@ -70,7 +70,7 @@ personal_work_sequence2video() {
     fi
 
     local video_crf
-    video_crf=$(input_number "请输入压制视频的crf值" "默认crf值为18" "允许输入范围「0-51」" "18" "(^$|^00$|^[0-9]$|^[1-4][0-9]$|^5[0-1]$)")
+    video_crf=$(input_number "请输入压制视频的crf值" "默认crf值为18" "允许输入范围「0-51」，x264编码器默认23" "18" "(^$|^00$|^[0-9]$|^[1-4][0-9]$|^5[0-1]$)")
     if [ $? -eq 10 ]; then
         return 20
     fi

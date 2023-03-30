@@ -23,13 +23,13 @@ compress_media_video() {
     fi
 
     local video_crf
-    video_crf=$(input_number "请输入压制视频的crf值" "默认crf值为28" "允许输入范围「0-51」" "28" "(^$|^00$|^[0-9]$|^[1-4][0-9]$|^5[0-1]$)")
+    video_crf=$(input_number "请输入压制视频的crf值" "默认crf值为28" "允许输入范围「0-51」，x265编码器默认28" "28" "(^$|^00$|^[0-9]$|^[1-4][0-9]$|^5[0-1]$)")
     if [ $? -eq 10 ]; then
         return 20
     fi
     local video_preset video_preset_array_to_string
     video_preset_array_to_string="ultrafast superfast veryfast faster fast medium slow slower veryslow placebo ULTRAFAST SUPERFAST VERYFAST FASTER FAST MEDIUM SLOW SLOWER VERYSLOW PLACEBO"
-    video_preset=$(input_string "请输入压制视频的preset值" "默认preset值为medium" "允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写" "medium" "$video_preset_array_to_string" "(^$|^00$|^[a-zA-Z]{4,9}$)")
+    video_preset=$(input_string "请输入压制视频的preset值" "默认preset值为slow" "允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写" "slow" "$video_preset_array_to_string" "(^$|^00$|^[a-zA-Z]{4,9}$)")
     if [ $? -eq 10 ]; then
         return 20
     fi
