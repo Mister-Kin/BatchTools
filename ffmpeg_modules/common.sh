@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ffmpeg_no_banner() {
+    # ffmpeg -hide_banner "$@" # 用以调试
     ffmpeg -hide_banner -loglevel error "$@"
 }
 
