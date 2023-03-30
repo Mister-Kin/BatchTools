@@ -100,6 +100,9 @@ personal_work_sequence2video() {
         return 20
     fi
 
+    draw_line_echo "~"
+    text_echo "当前已设置压制视频的帧率为「$sequence_video_fps」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
+
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)
     if [ "$watermark_flag" = true ]; then

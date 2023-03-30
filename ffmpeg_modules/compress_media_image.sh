@@ -33,6 +33,9 @@ compress_media_image() {
         return 20
     fi
 
+    draw_line_echo "~"
+    text_echo "当前已设置转换成webp格式为「$webp_flag」，设置删除源文件为「$delete_source_files」"
+
     log_start
     local operation_count=0 delete_count=0
     shopt -s nullglob
