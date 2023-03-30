@@ -115,6 +115,7 @@ personal_work_sequence2video() {
     detect_and_remove "file" "output.mp4"
     local operation_count=0
     draw_line_echo "~"
+    show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -r "$sequence_video_fps" -f image2 -i "$input_file" -r "$sequence_video_fps" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -profile:v high -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" "output.mp4"
     ((operation_count++))
     show_progress_bar "1" "$operation_count"

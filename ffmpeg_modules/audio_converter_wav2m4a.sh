@@ -34,6 +34,7 @@ audio_converter_wav2m4a() {
     local operation_count=0
     shopt -s nullglob
     draw_line_echo "~"
+    show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "wav"); do
         ffmpeg_no_banner -i "$file" -c:a libfdk_aac -b:a "$audio_bitrate" "$output_path/$(get_file_name "$file").m4a"
         ((operation_count++))

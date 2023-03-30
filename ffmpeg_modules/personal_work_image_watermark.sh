@@ -4,8 +4,8 @@ personal_work_image_watermark() {
     local output_path1="personal_work_image_watermark_webp"
     local output_path2="personal_work_image_watermark_original"
     local feature_name feature_intro feature_note
-    feature_name="给图片添加版权水印并压缩"
-    feature_intro="将路径下的png文件或者jpg文件或者jpeg文件或者gif文件，按原格式和webp格式压缩，并添加版权水印"
+    feature_name="给图片添加文字版权水印并压缩"
+    feature_intro="将路径下的png文件或者jpg文件或者jpeg文件或者gif文件，按原格式和webp格式压缩，并添加文字版权水印"
     feature_note="$(description_append_note "option_false" "directory" "$output_path1" "$output_path2")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -29,6 +29,7 @@ personal_work_image_watermark() {
     local operation_count=0
     shopt -s nullglob
     draw_line_echo "~"
+    show_progress_bar $(("$all_count" * 2)) "$operation_count"
     for file in $(file_extension_for_loop "png"); do
         ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path1/$(get_file_name "$file").webp"
         ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "png")" -pix_fmt pal8 "$output_path2/$(lowercase_file_name_extension "$file")"

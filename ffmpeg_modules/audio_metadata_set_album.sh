@@ -36,6 +36,7 @@ audio_metadata_set_album() {
     local operation_count=0
     shopt -s nullglob
     draw_line_echo "~"
+    show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata album="$audio_ablum" "$output_path/$file"
         ((operation_count++))

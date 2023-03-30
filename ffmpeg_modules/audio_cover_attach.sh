@@ -54,20 +54,20 @@ audio_cover_attach() {
         return 20
     fi
 
-    local audio_all_count m4a_count mp3_count flac_count image_all_count png_count jpg_count
+    local audio_count m4a_count mp3_count flac_count image_count png_count jpg_count
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    audio_all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    audio_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
     png_count=$(file_count "png")
     jpg_count=$(file_count "jpg")
-    image_all_count=$(("$png_count" + "$jpg_count"))
-    if [ "$audio_all_count" -eq 0 ] || [ "$image_all_count" -eq 0 ]; then
-        if [ "$audio_all_count" -eq 0 ]; then
+    image_count=$(("$png_count" + "$jpg_count"))
+    if [ "$audio_count" -eq 0 ] || [ "$image_count" -eq 0 ]; then
+        if [ "$audio_count" -eq 0 ]; then
             log_file_not_detected "m4a" "mp3" "flac"
             return 0
         fi
-        if [ "$image_all_count" -eq 0 ]; then
+        if [ "$image_count" -eq 0 ]; then
             log_file_not_detected "png" "jpg"
             return 0
         fi
@@ -79,7 +79,8 @@ audio_cover_attach() {
     shopt -s nullglob
     local -a check_image_flag
     draw_line_echo "~"
-    if [ "$image_all_count" -eq 1 ]; then
+    show_progress_bar "$audio_count" "$operation_count"
+    if [ "$image_count" -eq 1 ]; then
         for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
             for image_file in $(file_extension_for_loop "png" "jpg"); do
                 check_image_flag=($(check_image_good "$image_file"))
@@ -98,10 +99,10 @@ audio_cover_attach() {
                     # draw_line_echo "~"
                 fi
             done
-            show_progress_bar "$audio_all_count" "$operation_count"
+            show_progress_bar "$audio_count" "$operation_count"
         done
     fi
-    if [ "$image_all_count" -gt 1 ]; then
+    if [ "$image_count" -gt 1 ]; then
         local file_name image_file_name check_name_flag
         for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
             for image_file in $(file_extension_for_loop "png" "jpg"); do
@@ -170,13 +171,13 @@ audio_cover_attach() {
                     # draw_line_echo "~"
                 fi
             fi
-            show_progress_bar "$audio_all_count" "$operation_count"
+            show_progress_bar "$audio_count" "$operation_count"
         done
     fi
     if [ "$bad_resolution_count" -eq 0 ]; then
-        log_end "$operation_count" "$audio_all_count"
+        log_end "$operation_count" "$audio_count"
     else
-        log_end "$operation_count" "$audio_all_count" "其中生成的文件有$bad_resolution_count个因采用的封面图宽高比不为1，生成的封面图非正方形"
+        log_end "$operation_count" "$audio_count" "其中生成的文件有$bad_resolution_count个因采用的封面图宽高比不为1，生成的封面图非正方形"
     fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob

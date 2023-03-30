@@ -170,6 +170,7 @@ personal_work_add_subtitle() {
     make_directory "$output_path"
     local operation_count=0
     draw_line_echo "~"
+    show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -i "$input_video" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -profile:v high -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "$output_path/$(lowercase_file_name_extension "$input_video")"
     ((operation_count++))
     show_progress_bar "1" "$operation_count"

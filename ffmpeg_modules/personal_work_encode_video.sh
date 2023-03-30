@@ -88,6 +88,7 @@ personal_work_encode_video() {
     local operation_count=0
     shopt -s nullglob
     draw_line_echo "~"
+    show_progress_bar "$all_count" "$operation_count"
     if [ "$encode_audio_flag" = true ]; then
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
             ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -profile:v high -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" "$output_path/$(get_file_name "$file").mp4"

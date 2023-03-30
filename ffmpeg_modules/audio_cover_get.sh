@@ -28,6 +28,7 @@ audio_cover_get() {
     shopt -s nullglob
     local media_stream_number
     draw_line_echo "~"
+    show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
         if [ "$media_stream_number" -eq 2 ]; then

@@ -44,6 +44,7 @@ compress_media_image() {
         output_path="compress_media_image_original"
         make_directory "$output_path"
         draw_line_echo "~"
+        show_progress_bar "$all_count" "$operation_count"
         for file in $(file_extension_for_loop "jpg" "jpeg"); do
             ffmpeg_no_banner -i "$file" "$output_path/$(lowercase_file_name_extension "$file")"
             ((operation_count++))

@@ -14,13 +14,15 @@ video_converter_flv2mp4() {
     local all_count
     all_count=$(file_count "flv")
     if [ "$all_count" -eq 0 ]; then
-        file_not_detected "flv"
+        log_file_not_detected "flv"
         return 0
     fi
 
     log_start
     local operation_count=0
     shopt -s nullglob
+    draw_line_echo "~"
+    show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "flv"); do
         detect_and_remove "file" "${file%.*}.mp4"
         ffmpeg_no_banner -i "$file" -c copy "$(get_file_name "$file").mp4"

@@ -28,6 +28,7 @@ audio_metadata_by_file_name() {
     shopt -s nullglob
     local audio_title audio_artist file_name
     draw_line_echo "~"
+    show_progress_bar "$all_count" $(("$operation_count" + "$no_good_name_count"))
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         file_name=$(get_file_name "$file")
         if [[ "$file_name" == *" - "* ]]; then
