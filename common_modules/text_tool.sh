@@ -417,6 +417,10 @@ remove_last_zero() {
         last_char=$(get_last_char "$copy_str")
         if [[ "$last_char" =~ (0|\.) ]]; then
             copy_str=$(remove_last_char "$copy_str")
+            # 一旦检测到小数点，移除后便终止删除0
+            if [ "$last_char" = "." ]; then
+                break
+            fi
         else
             break
         fi
