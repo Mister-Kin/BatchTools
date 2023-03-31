@@ -392,3 +392,34 @@ show_progress_bar() {
         echo -e "\n"
     fi
 }
+
+calc_last_letter_length() {
+    local last_char unit_length copy_str str_len
+    copy_str="$1"
+    unit_length=0
+    str_len=$(get_string_length "$1")
+    for ((i = 1; i <= str_len; i++)); do
+        last_char=$(get_last_char "$copy_str")
+        if [[ "$last_char" =~ ([0-9]|\.) ]]; then
+            break
+        fi
+        copy_str=$(remove_last_char "$copy_str")
+        ((unit_length++))
+    done
+    echo "$unit_length"
+}
+
+remove_last_zero() {
+    local last_char copy_str str_len
+    copy_str="$1"
+    str_len=$(get_string_length "$1")
+    for ((i = 1; i <= str_len; i++)); do
+        last_char=$(get_last_char "$copy_str")
+        if [[ "$last_char" =~ (0|\.) ]]; then
+            copy_str=$(remove_last_char "$copy_str")
+        else
+            break
+        fi
+    done
+    echo "$copy_str"
+}
