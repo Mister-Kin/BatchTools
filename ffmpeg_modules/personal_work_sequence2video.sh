@@ -76,7 +76,7 @@ personal_work_sequence2video() {
     fi
 
     local video_max_bitrate
-    video_max_bitrate=$(input_number "请输入压制视频的最大码率" "默认最大码率值缺省为0" "允许输入格式为「数字+单位」，数字允许带小数点（精度限制两位小数），单位可为[k/K/M/G][i][b/B]，例如300kib、1.5M等（k为10^3——国际单位制SI，ki为2^10——国际电工委员会IEC，k和K二者含义一样，B=8b）单位缺省时默认为kbit/s，x264编码器默认0" "0" "(^$|^00$|^[0-9]+\.?[0-9]{0,2}[kKMG]?i?[bB]?$)")
+    video_max_bitrate=$(input_number "请输入压制视频的最大码率" "默认最大码率值缺省为0" "允许输入格式为「数字+单位」，单位缺省时默认为kbit/s，数字允许带小数点（精度限制两位小数），单位可为[k/K/M/G][i][B]，例如300kib、1.5MB等（k为10^3——国际单位制SI，ki为2^10——国际电工委员会IEC，k和K二者含义一样，B=8bit），x264编码器默认0" "0" "(^$|^00$|^[0-9]+\.?[0-9]{0,2}[kKMG]?i?[B]?$)")
     if [ $? -eq 10 ]; then
         return 20
     fi
@@ -87,7 +87,7 @@ personal_work_sequence2video() {
         video_max_bitrate_unit=$(get_last_any_char "$video_max_bitrate" "$unit_length")
         video_max_bitrate_number=$(remove_last_any_char "$video_max_bitrate" "$unit_length")
     else
-        video_max_bitrate_unit=""
+        video_max_bitrate_unit="k"
         video_max_bitrate_number="$video_max_bitrate"
     fi
     local last_char
