@@ -4,7 +4,7 @@ compress_media_video() {
     local output_path="compress_media_video"
     local feature_name feature_intro feature_note
     feature_name="压缩视频，转换为hevc编码的mp4格式（libx265）"
-    feature_intro="使用libx265，将路径下的mp4文件或者flv文件或者mov文件转换hevc编码的mp4格式$(description_append_intro "设置压制视频的crf值；设置压制视频的preset值；是否删除源文件")"
+    feature_intro="将路径下的mp4文件或者flv文件或者mov文件转换hevc编码的mp4格式（libx265）$(description_append_intro "设置压制视频的crf值；设置压制视频的preset值；是否删除源文件")"
     feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -28,8 +28,8 @@ compress_media_video() {
         return 20
     fi
     local video_preset video_preset_array_to_string
-    video_preset_array_to_string="ultrafast superfast veryfast faster fast medium slow slower veryslow placebo ULTRAFAST SUPERFAST VERYFAST FASTER FAST MEDIUM SLOW SLOWER VERYSLOW PLACEBO"
-    video_preset=$(input_string "请输入压制视频的preset值" "默认preset值为slow" "允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写" "slow" "$video_preset_array_to_string" "(^$|^00$|^[a-zA-Z]{4,9}$)")
+    video_preset_array_to_string="ultrafast superfast veryfast faster fast medium slow slower veryslow placebo"
+    video_preset=$(input_string "请输入压制视频的preset值" "默认preset值为slow" "允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写，x265编码器默认medium" "slow" "$video_preset_array_to_string" "(^$|^00$|^[a-zA-Z]{4,9}$)")
     if [ $? -eq 10 ]; then
         return 20
     fi
@@ -49,7 +49,7 @@ compress_media_video() {
     draw_line_echo "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy "$output_path/$(get_file_name "$file").mp4"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy -x265-params log-level=error "$output_path/$(get_file_name "$file").mp4"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

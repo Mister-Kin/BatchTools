@@ -4,8 +4,8 @@ personal_work_image_watermark() {
     local output_path1="personal_work_image_watermark_webp"
     local output_path2="personal_work_image_watermark_original"
     local feature_name feature_intro feature_note
-    feature_name="给图片添加文字版权水印并压缩"
-    feature_intro="将路径下的png文件或者jpg文件或者jpeg文件或者gif文件，按原格式和webp格式压缩，并添加文字版权水印"
+    feature_name="给图片添加版权文字水印并压缩"
+    feature_intro="将路径下的png文件或者jpg文件或者jpeg文件或者gif文件，按原格式和webp格式压缩，并添加版权文字水印"
     feature_note="$(description_append_note "option_false" "directory" "$output_path1" "$output_path2")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
