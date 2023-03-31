@@ -89,13 +89,17 @@ input_number() {
 # 参数2：提示默认值的信息，如「默认preset值为medium」
 # 参数3：提示可输入值的信息，如「允许输入「ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo」，要求全部小写或者全部大写」
 # 参数4：设置默认值，如「medium」
-# 参数5：设置可输入的字符串数组（需要以字符串形式传递给函数，否则函数的参数会剧增），格式要求每个单词相隔一个空格，如「ultrafast superfast veryfast faster fast medium slow slower veryslow placebo」
+# 参数5：设置可输入的字符串数组（需要以字符串形式传递给函数，否则函数的参数会剧增），格式要求每个单词相隔一个空格，如「ultrafast superfast veryfast faster fast medium slow slower veryslow placebo」，无需定义大写词组，程序会自动处理
 # 参数6：设置限制输入格式的正则表达式，需用圆括号括住，如「(^$|^[a-zA-Z]{4,9}$)」——该正则只允许输入：单回车键（不输入数字，直接回车）和4-9位的英文字母（不限大小写）。
 input_string() {
     draw_line_echo "-" >&2
     local user_input user_input_hint user_input_default_value_hint user_input_range_hint
     local string_value
-    local string_to_array=($5) # 使用圆括号重新定义变回数组，不能加双引号，否则定义失败导致仍是字符串
+    local input_string uppercase_input
+    input_string="$5"
+    uppercase_input=$(lowercase_to_uppercase "$5")
+    input_string="${input_string} ${uppercase_input}"
+    local string_to_array=($input_string) # 使用圆括号重新定义变回数组，不能加双引号，否则定义失败导致仍是字符串
     local found_flag=0
     user_input_default_value_hint="$2"
     user_input_hint="$1（$user_input_default_value_hint）："
