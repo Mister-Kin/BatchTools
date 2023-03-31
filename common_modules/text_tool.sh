@@ -319,6 +319,11 @@ get_last_char() {
     echo "${1: -1}"
 }
 
+# 获取最后任意个字符
+get_last_any_char() {
+    echo "${1: -$2}"
+}
+
 # 删除最后一个字符
 remove_last_char() {
     echo "${1::-1}"
