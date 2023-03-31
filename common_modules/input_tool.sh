@@ -108,6 +108,9 @@ input_string() {
     text_echo "提示：不输入（等待30s）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
     if read -e -t 30 -r -p "$user_input_hint" user_input; then
         while ! [ $found_flag -eq 1 ] || ! [[ "$user_input" =~ $6 ]]; do
+            if [ "$user_input" = "00" ]; then
+                return 10
+            fi
             if [[ "$user_input" =~ ^$ ]]; then
                 string_value="$4"
                 break
@@ -126,9 +129,6 @@ input_string() {
                 fi
             fi
         done
-        if [ "$user_input" = "00" ]; then
-            return 10
-        fi
     else
         echo >&2
         string_value="$4"
