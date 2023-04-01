@@ -35,5 +35,9 @@ filter_for_compress_with_copyright() {
 }
 
 get_media_info() {
-    echo $(ffprobe -hide_banner -loglevel error -show_entries "$2" -of default=noprint_wrappers=1:nokey=1 "$1")
+    echo "$(ffprobe -hide_banner -loglevel error -show_entries "$2" -of default=noprint_wrappers=1:nokey=1 "$1")"
+}
+
+get_media_info_for_time() {
+    echo "$(ffprobe -hide_banner -loglevel error -show_entries "$2" -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1")"
 }
