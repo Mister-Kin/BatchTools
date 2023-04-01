@@ -73,7 +73,7 @@ media_split_video() {
     local output_path="media_split_video"
     local feature_name feature_intro feature_note
     feature_name="分割视频"
-    feature_intro="将路径下的mp4文件或者flv文件或者mov文件按输入的时间点连续分割为多个视频文件$(description_append_intro "是否精确剪辑时间点；设置压制视频的crf值；设置压制视频的最大码率；设置压制视频的preset值；是否重新编码音频；设置压制音频的码率")"
+    feature_intro="将路径下的mp4文件或者flv文件或者mov文件按输入的时间点连续分割为多个视频文件$(description_append_intro "手动选择视频文件（有多个视频文件）；是否精确剪辑时间点；设置压制视频的crf值；设置压制视频的最大码率；设置压制视频的preset值；是否重新编码音频；设置压制音频的码率")"
     feature_note="$(set_color "blue")精确剪辑时间点方案采用重编码（基于libx264，可能有损，可自调参数控制质量）；非精确剪辑时间点方案可实现原版无损切割，但因为没有进行重编码，读取的关键帧依然是原视频的旧编码，切割时间点可能会有些许偏移；$(set_color "reset")$(description_append_note "option_false" "directory" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
