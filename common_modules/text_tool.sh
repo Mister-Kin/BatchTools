@@ -314,6 +314,25 @@ file_extension_for_loop() {
     echo "$file_extension"
 }
 
+# 获取任意位置的字符
+# ${str:position:length}
+# position仅指明位置，为负数时，则从尾部数起。例如-1就是指倒数第一个位置。
+# length：指定长度，从左往右计算长度。
+get_any_char() {
+    echo "${1:$2:$3}"
+}
+
+# 获取首个字符
+# ${str:0:1}可简写为${str::1}
+get_first_char() {
+    echo "${1::1}"
+}
+
+# 获取前面任意个字符
+get_first_any_char() {
+    echo "${1::$2}"
+}
+
 # 获取最后一个字符
 get_last_char() {
     echo "${1: -1}"
@@ -322,6 +341,16 @@ get_last_char() {
 # 获取最后任意个字符
 get_last_any_char() {
     echo "${1: -$2}"
+}
+
+# 删除首个字符
+remove_first_char() {
+    echo "${1:1}"
+}
+
+# 删除前面任意个字符
+remove_first_any_char() {
+    echo "${1:$2}"
 }
 
 # 删除最后一个字符
@@ -421,6 +450,23 @@ remove_last_zero() {
             if [ "$last_char" = "." ]; then
                 break
             fi
+        else
+            break
+        fi
+    done
+    echo "$copy_str"
+}
+
+remove_first_zero() {
+    local first_char second_char copy_str str_len
+    copy_str="$1"
+    str_len=$(get_string_length "$1")
+    # i+1：当copy_str实际缩减到second_char不存在时则终止
+    for ((i = 0; i + 1 < str_len; i++)); do
+        first_char=$(get_first_char "$copy_str")
+        second_char=$(get_any_char "$copy_str" "1" "1")
+        if [ "$first_char" = "0" ] && [ "$second_char" != "." ]; then
+            copy_str=$(remove_first_char "$copy_str")
         else
             break
         fi
