@@ -59,7 +59,11 @@ personal_work_add_subtitle() {
         video_max_bitrate_unit=$(get_last_any_char "$video_max_bitrate" "$unit_length")
         video_max_bitrate_number=$(remove_last_any_char "$video_max_bitrate" "$unit_length")
     else
-        video_max_bitrate_unit="k"
+        if [ "$video_max_bitrate" -eq 0 ]; then
+            video_max_bitrate_unit=""
+        else
+            video_max_bitrate_unit="k"
+        fi
         video_max_bitrate_number="$video_max_bitrate"
     fi
     local last_char
@@ -70,7 +74,7 @@ personal_work_add_subtitle() {
     video_max_bitrate_number=$(printf "%.2f" "$video_max_bitrate_number")
     video_max_bitrate_number=$(remove_last_zero "$video_max_bitrate_number")
     video_max_bitrate="${video_max_bitrate_number}${video_max_bitrate_unit}"
-    video_bufsize_number=$(echo $video_max_bitrate_number | gawk '{ printf "%.2f", $1 * 2 }')
+    video_bufsize_number=$(echo "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
     video_bufsize_number=$(remove_last_zero "$video_bufsize_number")
     video_bufsize="${video_bufsize_number}${video_max_bitrate_unit}"
 
