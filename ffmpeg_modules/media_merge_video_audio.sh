@@ -1,65 +1,124 @@
 #!/bin/bash
 
-merge_mp4_with_audio() {
-    description "合并视频和音频：mp4+m4a/mp3" "将不含音频流的mp4文件和m4a文件或者mp3文件合并输出为mp4格式的视频，不涉及重新编码；生成的文件输出在「video_with_audio」文件夹" "确保路径下没有名为「video_with_audio」文件夹，否则本功能操作将生成同名文件夹强制覆盖；如果路径下已有该文件夹，请先自行处理好文件再执行该功能"
+media_merge_video_audio() {
+    local output_path="media_merge_video_audio"
+    local feature_name feature_intro feature_note
+    feature_name="合并音视频：mp4+m4a/mp3"
+    feature_intro="将路径下的不含音频流的mp4文件或者flv文件或者mov文件和m4a文件或者mp3文件合并输出为mp4格式的视频，不涉及重新编码"
+    feature_note="$(description_append_note "option_false" "directory" "$output_path")"
+    description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
     if [ $? -eq 10 ]; then
         return 20
     fi
 
-    local mp4_count m4a_count mp3_count all_count
+    local video_count mp4_count flv_count mov_count audio_count m4a_count mp3_count
     mp4_count=$(file_count "mp4")
+    flv_count=$(file_count "flv")
+    mov_count=$(file_count "mov")
+    video_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
-    all_count=$mp4_count
+    audio_count=$(("$m4a_count" + "$mp3_count"))
 
-    if [ "$m4a_count" -eq 0 ] && [ "$mp3_count" -eq 0 ] || [ "$mp4_count" -eq 0 ]; then
-        echo "当前并未同时检测到mp4文件和m4a/mp3文件，已退出本次的功能操作"
-        return 0
-    fi
-    if [ "$mp4_count" -ge 1 ]; then
-        echo "当前检测到$mp4_count个mp4文件"
-        if [ "$mp4_count" -gt 1 ]; then
-            echo "mp4文件的数量已超过1个，本功能操作只能选择最前一个mp4文件作为视频流；请确保自己所需操作的文件在第一个，或者路径中只有一个mp4文件"
+    if [ "$audio_count" -eq 0 ] || [ "$video_count" -eq 0 ]; then
+        if [ "$video_count" -eq 0 ]; then
+            log_file_not_detected "mp4" "flv" "mov"
+            return 0
         fi
-    fi
-    if [ "$m4a_count" -eq 1 ] && [ "$mp3_count" -eq 1 ]; then
-        echo "当前检测到1个m4a文件和1个mp3文件，本程序将选用m4a文件作为封面图"
-    fi
-    if [ "$m4a_count" -ge 1 ]; then
-        echo "当前检测到$m4a_count个m4a文件"
-        if [ "$m4a_count" -gt 1 ]; then
-            echo "m4a文件的数量已超过1个，本功能操作只能选择最前一个m4a文件作为音频流；请确保自己所需操作的文件在第一个，或者路径中只有一个m4a文件"
-        fi
-    fi
-    if [ "$mp3_count" -ge 1 ]; then
-        echo "当前检测到$mp3_count个mp3文件"
-        if [ "$mp3_count" -gt 1 ]; then
-            echo "mp3文件的数量已超过1个，本功能操作只能选择最前一个mp3文件作为音频流；请确保自己所需操作的文件在第一个，或者路径中只有一个mp3文件"
+        if [ "$audio_count" -eq 0 ]; then
+            log_file_not_detected "m4a" "mp3"
+            return 0
         fi
     fi
 
-    local output_path="video_with_audio"
-    make_directory "$output_path"
-
-    draw_line "-"
-    echo "已开始本次的功能操作"
-    draw_line "~"
-    local audio_file mp4_file
-    local operation_count=0
     shopt -s nullglob
-    mp4_file=(*.mp4)
-    if [ "$m4a_count" -gt 0 ]; then
-        audio_file=(*.m4a)
+    local input_video
+    if [ "$video_count" -eq 1 ]; then
+        for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
+            input_video="$file"
+        done
     else
-        audio_file=(*.mp3)
+        draw_line_echo "-"
+        text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+        text_echo "当前路径下检测到多个视频文件"
+        text_echo "现在进入手动选择视频文件模式，请选择需要合并的视频文件："
+        local -a video_file_array=()
+        if [ "$mp4_count" -ne 0 ]; then
+            video_file_array+=(*.mp4)
+            video_file_array+=(*.MP4)
+        fi
+        if [ "$flv_count" -ne 0 ]; then
+            video_file_array+=(*.flv)
+            video_file_array+=(*.FLV)
+        fi
+        if [ "$mov_count" -ne 0 ]; then
+            video_file_array+=(*.mov)
+            video_file_array+=(*.MOV)
+        fi
+        video_file_array+=("取消功能操作，返回菜单")
+        arrow_select_option "${video_file_array[@]}"
+        local choice=$?
+        local choice_exit=$((${#video_file_array[@]} - 1))
+        if [ $choice -eq $choice_exit ]; then
+            return 20
+        fi
+        input_video="${video_file_array[$choice]}"
+    fi
+
+    local input_audio
+    if [ "$audio_count" -eq 1 ]; then
+        for file in $(file_extension_for_loop "m4a" "mp3"); do
+            input_audio="$file"
+        done
+    fi
+    if [ "$audio_count" -gt 1 ]; then
+        local video_file_name audio_file_name check_name_flag
+        for file in $(file_extension_for_loop "m4a" "mp3"); do
+            video_file_name=$(get_file_name "$input_video")
+            audio_file_name=$(get_file_name "$file")
+            if [ "$video_file_name" = "$audio_file_name" ]; then
+                check_name_flag=true
+                input_audio="$file"
+                break
+            else
+                check_name_flag=false
+            fi
+        done
+        if [ "$check_name_flag" = false ]; then
+            draw_line_echo "-"
+            text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+            text_echo "当前路径下检测到多个音频文件，但并未检测到和「$input_video」同名的音频文件"
+            text_echo "现在进入手动选择音频文件模式，请选择需要合并的音频文件："
+            local -a audio_file_array=()
+            if [ "$mp3_count" -ne 0 ]; then
+                audio_file_array+=(*.mp3)
+                audio_file_array+=(*.MP3)
+            fi
+            if [ "$m4a_count" -ne 0 ]; then
+                audio_file_array+=(*.m4a)
+                audio_file_array+=(*.M4A)
+            fi
+            audio_file_array+=("取消功能操作，返回菜单")
+            arrow_select_option "${audio_file_array[@]}"
+            local choice=$?
+            local choice_exit=$((${#audio_file_array[@]} - 1))
+            if [ $choice -eq $choice_exit ]; then
+                return 20
+            fi
+            input_audio="${audio_file_array[$choice]}"
+        fi
     fi
     shopt -u nullglob
 
-    ffmpeg_no_banner -i "${mp4_file[0]}" -i "${audio_file[0]}" -c copy "$output_path/${mp4_file[0]}"
-    draw_line "~"
+    log_start
+    make_directory "$output_path"
+    local operation_count=0
+    draw_line_echo "~"
+    show_progress_bar "1" "$operation_count"
+    ffmpeg_no_banner -i "$input_video" -i "$input_audio" -c copy "$output_path/$(lowercase_file_name_extension "$input_video")"
     ((operation_count++))
-    echo "已结束本次的功能操作，总共执行了$operation_count次转换操作（当前路径检测到$all_count个可操作文件）"
-
-    finished_word "directory" "$output_path"
+    show_progress_bar "1" "$operation_count"
+    log_end "$operation_count" "$video_count"
+    log_result "$feature_note"
 }
