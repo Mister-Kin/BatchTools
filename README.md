@@ -5,31 +5,47 @@ Some batch scripts for easily doing work.
 
 ## Features
 - ffmpeg.sh
-  - 给图片添加版权水印并压缩
-  - 合并视频和音频：mp4+m4a/mp3
-  - 生成avc编码的mp4格式视频（libx264）
-  - 压缩图片（原格式压缩或者转换为webp格式）
-  - 压缩视频，转换为hevc编码的mp4格式（libx265）
-  - 重命名音频
-  - 为音频添加封面图
-  - 获取音频封面图
-  - webp格式转png格式（删除源文件）
-  - tga格式转png格式
-  - 无损分割视频
-  - flv格式转mp4格式
-  - 显卡加速将图片序列合成为视频（不再维护该功能）
+  - 个人工作：批量操作媒体资源
+    - 给图片添加文字版权水印并压缩
+    - 给视频添加文字版权水印（libx264）
+    - 图片序列导出mp4格式视频（libx264）
+    - 重编码视频导出mp4格式视频（libx264）
+    - 添加字幕（硬编码，libx264）
+    - 显卡加速将图片序列合成为视频（不再维护该功能）
+  - 压缩媒体资源
+    - 压缩图片（原格式压缩或者转换为webp格式）
+    - 压缩视频，转换为hevc编码的mp4格式（libx265）
+  - 图片转换器：图片格式互转
+    - 图片转png格式
+  - 视频转换器：视频格式互转
+    - flv格式转mp4格式
+  - 音频转换器：音频格式互转
+    - wav格式转m4a格式
+  - 音频元数据标签工具
+    - 根据元数据标签重命名音频文件
+    - 根据音频文件名修改元数据标签
+    - 设置音频文件的专辑名
+    - 设置音频文件的歌曲名
+    - 设置音频文件的歌手名
+  - 音频封面图工具：获取、添加、删除
+    - 获取音频封面图
+    - 添加音频封面图
+    - 删除音频封面图
+  - 媒体资源工具：合并、分割、缩放
+    - 合并音视频：mp4+m4a/mp3
+    - 分割视频
 - text.sh
-  - 合并文本文件
-  - 合并文本文件（逐行合并）
+  - 合并文本文件（文件首尾拼接）
+  -  合并文本文件（逐行拼接合并）
 
 ## Usage
 [Jump to Documentation Page][]
 
 [Jump to Documentation Page]: https://mister-kin.github.io/works/software-works/batch-tools/
 
-Just run the script file in terminal and follow the hint.
+Just execute the script file and follow the hint after inputting following command in shell terminal:
 
-P.S. Please ensure that only files you want to deal with exist in the path. It's hard to program with consideration of all situation, so the hint of program might not accord with your real situation.
+`cd drive:/path/BatchTools/ && ./ffmpeg.sh`
 
 ## Author
 **BatchTools** © Mr. Kin, all files released under the [WTFPL][] license.
