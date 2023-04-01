@@ -7,6 +7,7 @@ personal_work() {
     menu_options_array+=("图片序列导出mp4格式视频（libx264）")
     menu_options_array+=("重编码视频导出mp4格式视频（libx264）")
     menu_options_array+=("添加字幕（硬编码，libx264）")
+    menu_options_array+=("显卡加速将图片序列合成为视频（不再维护该功能）")
     menu_options_array+=("退出子菜单")
     while true; do
         clear
@@ -40,6 +41,11 @@ personal_work() {
         "给图片添加版权水印并压缩")
             while [ $? -ne 20 ]; do
                 personal_work_image_watermark
+            done
+            ;;
+        "显卡加速将图片序列合成为视频（不再维护该功能）")
+            while [ $? -ne 20 ]; do
+                personal_work_sequence2video_nvenc
             done
             ;;
         "退出子菜单")

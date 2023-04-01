@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 使用gawk改进处理函数返回字符串数组：未操作的文件打印数组列表。
+# to-do：使用gawk改进处理函数返回字符串数组：未操作的文件打印数组列表。
 
 for file in ./common_modules/* ./ffmpeg_modules/*; do
     source "$file"
