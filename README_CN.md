@@ -1,17 +1,17 @@
-Language: EN [CN][ReadmeCN]
+语言: [英][Readme] 中
 
-[ReadmeCN]: ./README_CN.md
+[Readme]: ./README.md
 
-# Batch Tools
+# 批处理工具
 ![Shell Type][] [![License][]](./LICENSE)
 
 [Shell Type]: https://img.shields.io/badge/shell-Git_Bash_|_Zsh-blue
 [License]: https://img.shields.io/github/license/Mister-Kin/BatchTools?color=blue
 
-## Introduction
-Some batch scripts for easily doing work.
+## 介绍
+一些方便工作的批处理脚本。
 
-## Features
+## 功能
 - ffmpeg.sh
   - 个人工作：批量操作媒体资源
     - 给图片添加版权文字水印并压缩
@@ -47,33 +47,33 @@ Some batch scripts for easily doing work.
     - 合并文本文件（文件首尾拼接）
     - 合并文本文件（逐行拼接合并）
 
-## Usage
-[Jump to Documentation Page][]
+## 用法
+[跳转到文档页面][]
 
-[Jump to Documentation Page]: https://mister-kin.github.io/works/software-works/batch-tools/
+[跳转到文档页面]: https://mister-kin.github.io/works/software-works/batch-tools/
 
-1. Clone this repo to local machine.
-2. Add the path of FFmpeg executable binary to the system environment variable `PATH`.
-3. Type the following command in a shell terminal to execute the script file and follow the prompts.
+1. 克隆本仓库到本地机器上。
+2. 将 FFmpeg 可执行二进制文件的路径添加到系统环境变量 `PATH` 中。
+3. 在 shell 终端中输入以下命令，执行脚本文件并按照提示操作。
 
 `cd drive:/path/BatchTools/ && ./ffmpeg.sh`
 
-The drive:/path in the above command depends on actual file path.
+上方命令中的 `drive:/path` 取决于实际的文件路径。
 
-## Author
-**BatchTools** © Mr. Kin, all files released under the [WTFPL][] license.
+## 作者
+**批处理工具** © Mr. Kin，所有文件均采用 [WTFPL][] 许可协议进行发布。
 
-Authored and maintained by Mr. Kin.
+由 Mr. Kin 著作并维护。
 
-> [Blog][] · [GitHub][] · [Weibo][] · [Zhihu][] · [AcFun][] · [Bilibili][] · [Youku][] · [Headline][] · [YouTube][]
+> [博客][] · [GitHub][] · [微博][] · [知乎][] · [AcFun][] · [哔哩哔哩][] · [优酷][] · [头条][] · [油管][]
 
 [WTFPL]: ./LICENSE
-[Blog]: https://mister-kin.github.io
+[博客]: https://mister-kin.github.io
 [GitHub]: https://github.com/mister-kin
-[Weibo]: https://weibo.com/6270111192
-[Bilibili]: http://space.bilibili.com/17025250?
-[Youku]: http://i.youku.com/i/UNjA3MTk5Mjgw?spm=a2hzp.8253869.0.0
-[YouTube]: https://www.youtube.com/@Mister-Kin
-[Headline]: https://www.toutiao.com/c/user/835254071079053/#mid=1663279303982091
-[Zhihu]: https://www.zhihu.com/people/drwu-94
+[微博]: https://weibo.com/6270111192
+[知乎]: https://www.zhihu.com/people/drwu-94
+[哔哩哔哩]: http://space.bilibili.com/17025250?
+[优酷]: http://i.youku.com/i/UNjA3MTk5Mjgw?spm=a2hzp.8253869.0.0
+[头条]: https://www.toutiao.com/c/user/835254071079053/#mid=1663279303982091
+[油管]: https://www.youtube.com/@Mister-Kin
 [AcFun]: https://www.acfun.cn/u/73269306
