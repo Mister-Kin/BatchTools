@@ -20,7 +20,7 @@ merge_text_file_line_by_line() {
         return 0
     fi
     if [ "$txt_count" -eq 1 ]; then
-        echo "当前只检测到1个txt文件，无需进行合并操作，已退出本次的功能操作"
+        printf "当前只检测到1个txt文件，无需进行合并操作，已退出本次的功能操作\n"
         return 0
     fi
 
@@ -34,10 +34,10 @@ merge_text_file_line_by_line() {
         paste -d "\n" "${txt_file_array[0]}" "${txt_file_array[1]}" >merged.txt
         ((operation_count++))
         if [ "$txt_count" -gt 2 ]; then
-            draw_line_echo "~"
-            text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-            text_echo "当前路径下检测到超过两个txt文件"
-            text_echo "现在进入手动选择txt文件模式，请选择需要合并的两个txt文件："
+            draw_line_blank "~"
+            text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+            text_blank "当前路径下检测到超过两个txt文件"
+            text_blank "现在进入手动选择txt文件模式，请选择需要合并的两个txt文件："
             txt_file_array+=("取消功能操作，返回菜单")
             local select_txt1 select_opt1 select_txt2
             arrow_select_option "${txt_file_array[@]}"
@@ -49,9 +49,9 @@ merge_text_file_line_by_line() {
             select_txt1="${txt_file_array[$choice]}"
             select_opt1=$choice
             while [ $choice -eq $select_opt1 ]; do
-                draw_line_echo "~"
-                text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-                text_echo "请选择需要合并的第二个txt文件，不能是刚才第一个选择的文件："
+                draw_line_blank "~"
+                text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+                text_blank "请选择需要合并的第二个txt文件，不能是刚才第一个选择的文件："
                 arrow_select_option "${txt_file_array[@]}"
                 choice=$?
                 choice_exit=$((${#txt_file_array[@]} - 1))

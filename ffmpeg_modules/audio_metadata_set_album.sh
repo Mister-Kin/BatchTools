@@ -28,14 +28,14 @@ audio_metadata_set_album() {
         return 20
     fi
 
-    draw_line_echo "-"
-    text_echo "当前已设置元数据标签-专辑名为「$audio_ablum」"
+    draw_line_blank "-"
+    text_blank "当前已设置元数据标签-专辑名为「$audio_ablum」"
 
     log_start
     make_directory "$output_path"
     local operation_count=0
     shopt -s nullglob
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata album="$audio_ablum" "$output_path/$file"

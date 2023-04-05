@@ -14,7 +14,7 @@ calc_non_numeric_index() {
             break
         fi
     done
-    echo "$non_numeric_idx"
+    printf "%d" "$non_numeric_idx"
 }
 
 # 根据用户输入计算总秒数
@@ -66,7 +66,7 @@ calc_second_time() {
     result_array+=("$hour")
     result_array+=("$minute")
     result_array+=("$second")
-    echo "${result_array[@]}"
+    printf "%s " "${result_array[@]}" # printf输出数组，相当于多个变量，必须加空格分割开。echo语句则不需要
 }
 
 media_split_video() {
@@ -98,10 +98,10 @@ media_split_video() {
             input_video="$file"
         done
     else
-        draw_line_echo "-"
-        text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-        text_echo "当前路径下检测到多个视频文件"
-        text_echo "现在进入手动选择视频模式，请选择需要添加字幕的视频："
+        draw_line_blank "-"
+        text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+        text_blank "当前路径下检测到多个视频文件"
+        text_blank "现在进入手动选择视频模式，请选择需要添加字幕的视频："
         local -a video_file_array=()
         if [ "$mp4_count" -ne 0 ]; then
             video_file_array+=(*.mp4)
@@ -167,7 +167,7 @@ media_split_video() {
         video_max_bitrate_number=$(printf "%.2f" "$video_max_bitrate_number")
         video_max_bitrate_number=$(remove_last_zero "$video_max_bitrate_number")
         video_max_bitrate="${video_max_bitrate_number}${video_max_bitrate_unit}"
-        video_bufsize_number=$(echo "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
+        video_bufsize_number=$(printf "%s" "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
         video_bufsize_number=$(remove_last_zero "$video_bufsize_number")
         video_bufsize="${video_bufsize_number}${video_max_bitrate_unit}"
 
@@ -193,15 +193,15 @@ media_split_video() {
             audio_bitrate="${audio_bitrate}k"
         fi
 
-        draw_line_echo "-"
+        draw_line_blank "-"
         if [ "$encode_audio_flag" = true ]; then
-            text_echo "当前已设置精确剪辑时间点为「$accurate_clip_time」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」"
+            text_blank "当前已设置精确剪辑时间点为「$accurate_clip_time」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」"
         else
-            text_echo "当前已设置精确剪辑时间点为「$accurate_clip_time」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」"
+            text_blank "当前已设置精确剪辑时间点为「$accurate_clip_time」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」"
         fi
     else
-        draw_line_echo "-"
-        text_echo "当前已设置精确剪辑时间点为「$accurate_clip_time」"
+        draw_line_blank "-"
+        text_blank "当前已设置精确剪辑时间点为「$accurate_clip_time」"
     fi
 
     local original_duration_second_total original_duration_time_total duration_second_total duration_time_total
@@ -227,10 +227,10 @@ media_split_video() {
         duration_time_total_text+="$duration_minute分"
     fi
     duration_time_total_text+="$duration_second秒"
-    draw_line_echo "-"
-    text_echo "当前选择的「$input_video」："
-    text_echo "视频总时长为$duration_time_total_text"
-    text_echo "视频时长总秒数为$duration_second_total秒"
+    draw_line_blank "-"
+    text_blank "当前选择的「$input_video」："
+    text_blank "视频总时长为$duration_time_total_text"
+    text_blank "视频时长总秒数为$duration_second_total秒"
 
     log_start
     make_directory "$output_path"
@@ -244,19 +244,19 @@ media_split_video() {
     local -a get_time
     local get_time_hour get_time_minute get_time_second
     while [ "$clip_end_time" -lt "$duration_second_total_int" ]; do
-        draw_line_echo "~"
-        text_echo "当前已设置剪辑起始时间点为「$clip_start_time_text」"
-        user_input_time=$(input_number_waiting_user "请输入下一个时间点" "允许输入格式为「小时[分隔符]分钟[分隔符]秒钟[分隔符]」，要求小时、分钟、秒钟都必须输入数值，注意分钟和秒钟数值限制为六十进制。分隔符可为「小数点.或者字母hms（字母不区分大小写）」，秒钟后面的分隔符只能为字母s（此项可有可无）。例如1小时10分5秒，这些例子均满足要求「1.10.5」「1H10m5s」「1.10M5s」「1h10.5」。输入「end」或者「大于视频总时长的时间点」即代表视频末尾处（字母不区分大小写）" "(^00$|^[0-5]?[0-9][Ss]?$|^[0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[0-9]+[Hh\.][0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[Ee][Nn][Dd]$)")
+        draw_line_blank "~"
+        text_blank "当前已设置剪辑起始时间点为「$clip_start_time_text」"
+        user_input_time=$(input_number_waiting_user "请输入下一个时间点" "允许输入格式为「小时[分隔符]分钟[分隔符]秒钟[分隔符]」，注意分钟和秒钟数值限制为六十进制。分隔符可为「小数点.或者字母hms（字母不区分大小写）」，秒钟后面的分隔符只能为字母s（此项可有可无）。例如1小时10分5秒，这些例子均满足要求「1.10.5」「1H10m5s」「1.10M5s」「1h10.5」。输入「end」或者「大于视频总时长的时间点」即代表视频末尾处（字母不区分大小写）。若分隔符包含时钟分隔符和分钟分隔符，则要求小时、分钟、秒钟都必须输入数值。若分隔符只有分钟分隔符，则要求分钟、秒钟都必须输入数值。若无分隔符，则只要求输入秒钟" "(^00$|^[0-5]?[0-9][Ss]?$|^[0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[0-9]+[Hh\.][0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[Ee][Nn][Dd]$)")
         if [ $? -eq 10 ]; then
             return 20
         fi
 
         get_time=($(calc_second_time "$user_input_time" "$duration_second_total_int"))
         while [ "${get_time[0]}" -le "$clip_start_time" ]; do
-            draw_line_echo "~"
-            text_echo "$(set_color "red")当前输入的时间点小于或等于剪辑起始时间点，请重新输入一个大于剪辑起始时间点的时间点：$(set_color "reset")"
-            text_echo "当前已设置剪辑起始时间点为「$clip_start_time_text」"
-            user_input_time=$(input_number_waiting_user "请输入下一个时间点" "允许输入格式为「小时[分隔符]分钟[分隔符]秒钟[分隔符]」，要求小时、分钟、秒钟都必须输入数值，注意分钟和秒钟数值限制为六十进制。分隔符可为「小数点.或者字母hms（字母不区分大小写）」，秒钟后面的分隔符只能为字母s（此项可有可无）。例如1小时10分5秒，这些例子均满足要求「1.10.5」「1H10m5s」「1.10M5s」「1h10.5」。输入「end」或者「大于视频总时长的时间点」即代表视频末尾处（字母不区分大小写）" "(^00$|^[0-5]?[0-9][Ss]?$|^[0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[0-9]+[Hh\.][0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[Ee][Nn][Dd]$)")
+            draw_line_blank "~"
+            text_blank "$(set_color "red")当前输入的时间点小于或等于剪辑起始时间点，请重新输入一个大于剪辑起始时间点的时间点：$(set_color "reset")"
+            text_blank "当前已设置剪辑起始时间点为「$clip_start_time_text」"
+            user_input_time=$(input_number_waiting_user "请输入下一个时间点" "允许输入格式为「小时[分隔符]分钟[分隔符]秒钟[分隔符]」，注意分钟和秒钟数值限制为六十进制。分隔符可为「小数点.或者字母hms（字母不区分大小写）」，秒钟后面的分隔符只能为字母s（此项可有可无）。例如1小时10分5秒，这些例子均满足要求「1.10.5」「1H10m5s」「1.10M5s」「1h10.5」。输入「end」或者「大于视频总时长的时间点」即代表视频末尾处（字母不区分大小写）。若分隔符包含时钟分隔符和分钟分隔符，则要求小时、分钟、秒钟都必须输入数值。若分隔符只有分钟分隔符，则要求分钟、秒钟都必须输入数值。若无分隔符，则只要求输入秒钟" "(^00$|^[0-5]?[0-9][Ss]?$|^[0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[0-9]+[Hh\.][0-5]?[0-9][Mm\.][0-5]?[0-9][Ss]?$|^[Ee][Nn][Dd]$)")
             if [ $? -eq 10 ]; then
                 return 20
             fi
@@ -284,11 +284,11 @@ media_split_video() {
         # 计算并设置剪辑终止时间点的秒数
         clip_end_time="${get_time[0]}"
         if [ "$clip_end_time" -ge "$duration_second_total_int" ]; then
-            draw_line_echo "~"
+            draw_line_blank "~"
             if [ "$clip_end_time" -eq "$duration_second_total_int" ]; then
-                text_echo "当前输入的时间点为视频末尾处"
+                text_blank "当前输入的时间点为视频末尾处"
             else
-                text_echo "当前输入的时间点已超过视频总时长，本程序已自动将时间点设置为视频末尾处"
+                text_blank "当前输入的时间点已超过视频总时长，本程序已自动将时间点设置为视频末尾处"
             fi
             clip_end_time="$duration_second_total"
             clip_end_time_text="end"
@@ -308,13 +308,13 @@ media_split_video() {
         fi
 
         if [ "$clip_end_time" = "$duration_second_total" ]; then
-            clip_duration=$(echo "$clip_start_time" "$clip_end_time" | gawk '{ printf "%.3f", $2 - $1 }')
+            clip_duration=$(printf "%s" "$clip_start_time $clip_end_time" | gawk '{ printf "%.3f", $2 - $1 }')
         else
             clip_duration=$(("$clip_end_time" - "$clip_start_time"))
         fi
 
-        draw_line_echo "~"
-        text_echo "当前剪切$clip_duration秒视频，已在「$output_path」文件夹中输出文件「$clip_start_time_text - $clip_end_time_text.$input_video_extension」"
+        draw_line_blank "~"
+        text_blank "当前剪切$clip_duration秒视频，已在「$output_path」文件夹中输出文件「$clip_start_time_text - $clip_end_time_text.$input_video_extension」"
 
         # 剪辑终止时间点若等于视频总时长终点，则转换为整数，避免循环条件中的test比较数值时出错
         if [ "$clip_end_time" = "$duration_second_total" ]; then

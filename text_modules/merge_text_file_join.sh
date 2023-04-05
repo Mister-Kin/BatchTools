@@ -25,23 +25,23 @@ merge_text_file_join() {
 
     local txt_flag srt_flag
     if [ "$txt_count" -lt 2 ]; then
-        draw_line_echo "~"
-        text_echo "当前检测到txt文件数量不足两个，无需进行合并txt文件操作"
+        draw_line_blank "~"
+        text_blank "当前检测到txt文件数量不足两个，无需进行合并txt文件操作"
         txt_flag=false
     else
         txt_flag=true
     fi
     if [ "$srt_count" -lt 2 ]; then
-        draw_line_echo "~"
-        text_echo "当前检测到srt文件数量不足两个，无需进行合并srt文件操作"
+        draw_line_blank "~"
+        text_blank "当前检测到srt文件数量不足两个，无需进行合并srt文件操作"
         srt_flag=false
     else
         srt_flag=true
     fi
 
     if [ "$txt_flag" = false ] && [ "$srt_flag" = false ]; then
-        draw_line_echo "~"
-        text_echo "当前检测到的txt文件和srt文件的数量均不足两个，无需进行合并操作，已退出本次的功能操作"
+        draw_line_blank "~"
+        text_blank "当前检测到的txt文件和srt文件的数量均不足两个，无需进行合并操作，已退出本次的功能操作"
         return 0
     fi
 
@@ -50,7 +50,7 @@ merge_text_file_join() {
     local operation_count2=0
     shopt -s nullglob
     if [ "$txt_flag" = true ]; then
-        draw_line_echo "~"
+        draw_line_blank "~"
         for file in $(file_extension_for_loop "txt"); do
             cat "$file" >>"merged.txt"
             ((operation_count1++))
@@ -58,7 +58,7 @@ merge_text_file_join() {
         done
     fi
     if [ "$srt_flag" = true ]; then
-        draw_line_echo "~"
+        draw_line_blank "~"
         for file in $(file_extension_for_loop "srt"); do
             cat "$file" >>"merged.srt"
             ((operation_count2++))
@@ -66,7 +66,7 @@ merge_text_file_join() {
         done
     fi
 
-    log_end "$(($operation_count1 + $operation_count2))" "$all_count"
+    log_end "$(("$operation_count1" + "$operation_count2"))" "$all_count"
     log_result "$feature_note"
     shopt -u nullglob
 }

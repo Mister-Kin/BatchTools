@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# to-do：压缩音频
+# TODO：压缩音频
 
 compress_media() {
     local -a menu_options_array
@@ -9,10 +9,10 @@ compress_media() {
     menu_options_array+=("退出子菜单")
     while true; do
         clear
-        draw_line_echo "="
-        echo -e "FFmpeg批处理工具子菜单 —— 压缩媒体资源\n"
-        echo "提示：使用上下方向键↑↓选择，回车键Enter确认选项："
-        echo -e "\n请选择子菜单：\n"
+        draw_line_blank "="
+        text_blank "FFmpeg批处理工具子菜单 —— 压缩媒体资源"
+        text_blank "提示：使用上下方向键↑↓选择，回车键Enter确认选项"
+        text_blank "请选择子菜单："
         arrow_select_option "${menu_options_array[@]}"
         local choice=$?
         case ${menu_options_array[$choice]} in

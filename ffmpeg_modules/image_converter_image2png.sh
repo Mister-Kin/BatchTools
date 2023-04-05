@@ -30,14 +30,14 @@ image_converter_image2png() {
         return 20
     fi
 
-    draw_line_echo "-"
-    text_echo "当前已设置删除源文件为「$delete_source_files」"
+    draw_line_blank "-"
+    text_blank "当前已设置删除源文件为「$delete_source_files」"
 
     log_start
     make_directory "$output_path"
     local operation_count=0
     shopt -s nullglob
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "tga" "jpg" "jpeg" "gif" "webp"); do
         ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").png"

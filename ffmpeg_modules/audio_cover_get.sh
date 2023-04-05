@@ -27,7 +27,7 @@ audio_cover_get() {
     local operation_count=0 no_cover_count=0
     shopt -s nullglob
     local media_stream_number
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
@@ -35,8 +35,8 @@ audio_cover_get() {
             ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/$(get_file_name "$file").png"
             ((operation_count++))
         else
-            # draw_line_echo "~"
-            # text_echo "「$file」文件内部没有封面图，无法获取音频封面图"
+            # draw_line_blank "~"
+            # text_blank "「$file」文件内部没有封面图，无法获取音频封面图"
             ((no_cover_count++))
         fi
         show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))

@@ -33,8 +33,8 @@ compress_media_image() {
         return 20
     fi
 
-    draw_line_echo "-"
-    text_echo "当前已设置转换成webp格式为「$webp_flag」，设置删除源文件为「$delete_source_files」"
+    draw_line_blank "-"
+    text_blank "当前已设置转换成webp格式为「$webp_flag」，设置删除源文件为「$delete_source_files」"
 
     log_start
     local operation_count=0 delete_count=0
@@ -43,7 +43,7 @@ compress_media_image() {
     if [ "$webp_flag" = false ]; then
         output_path="compress_media_image_original"
         make_directory "$output_path"
-        draw_line_echo "~"
+        draw_line_blank "~"
         show_progress_bar "$all_count" "$operation_count"
         for file in $(file_extension_for_loop "jpg" "jpeg"); do
             ffmpeg_no_banner -i "$file" "$output_path/$(lowercase_file_name_extension "$file")"
@@ -63,7 +63,7 @@ compress_media_image() {
     else
         output_path="compress_media_image_webp"
         make_directory "$output_path"
-        draw_line_echo "~"
+        draw_line_blank "~"
         for file in $(file_extension_for_loop "png" "jpg" "jpeg" "gif"); do
             ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").webp"
             ((operation_count++))

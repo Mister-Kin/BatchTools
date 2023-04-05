@@ -32,10 +32,10 @@ audio_metadata_set_artist() {
             file="$audio_file"
         done
     else
-        draw_line_echo "~"
-        text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-        text_echo "当前路径下检测到多个音频文件"
-        text_echo "现在进入手动选择音频文件模式，请选择需要修改元数据标签-歌手名的音频："
+        draw_line_blank "~"
+        text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+        text_blank "当前路径下检测到多个音频文件"
+        text_blank "现在进入手动选择音频文件模式，请选择需要修改元数据标签-歌手名的音频："
         local -a audio_file_array=()
         if [ "$m4a_count" -ne 0 ]; then
             audio_file_array+=(*.m4a)
@@ -64,10 +64,10 @@ audio_metadata_set_artist() {
     if [ $? -eq 10 ]; then
         return 20
     fi
-    draw_line_echo "~"
-    text_echo "当前已设置元数据标签-歌手名为「$audio_artist」"
+    draw_line_blank "~"
+    text_blank "当前已设置元数据标签-歌手名为「$audio_artist」"
 
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_artist" "$output_path/$file"
     ((operation_count++))

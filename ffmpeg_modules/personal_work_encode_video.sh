@@ -55,7 +55,7 @@ personal_work_encode_video() {
     video_max_bitrate_number=$(printf "%.2f" "$video_max_bitrate_number")
     video_max_bitrate_number=$(remove_last_zero "$video_max_bitrate_number")
     video_max_bitrate="${video_max_bitrate_number}${video_max_bitrate_unit}"
-    video_bufsize_number=$(echo "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
+    video_bufsize_number=$(printf "%s" "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
     video_bufsize_number=$(remove_last_zero "$video_bufsize_number")
     video_bufsize="${video_bufsize_number}${video_max_bitrate_unit}"
 
@@ -87,11 +87,11 @@ personal_work_encode_video() {
         return 20
     fi
 
-    draw_line_echo "-"
+    draw_line_blank "-"
     if [ "$encode_audio_flag" = true ]; then
-        text_echo "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」，设置添加版权文字水印为「$watermark_flag」"
+        text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」，设置添加版权文字水印为「$watermark_flag」"
     else
-        text_echo "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置添加版权文字水印为「$watermark_flag」"
+        text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置添加版权文字水印为「$watermark_flag」"
     fi
 
     local watermark_effect filter_effect
@@ -106,7 +106,7 @@ personal_work_encode_video() {
     make_directory "$output_path"
     local operation_count=0
     shopt -s nullglob
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     if [ "$encode_audio_flag" = true ]; then
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do

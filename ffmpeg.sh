@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# to-do：使用gawk改进处理函数返回字符串数组：未操作的文件打印数组列表。
+# TODO：使用gawk改进处理函数返回字符串数组：未操作的文件打印数组列表。
 
 for file in ./common_modules/* ./ffmpeg_modules/*; do
     source "$file"
@@ -18,10 +18,10 @@ main_menu_options_array+=("退出程序")
 
 while true; do
     clear
-    draw_line_echo "="
-    echo -e "FFmpeg批处理工具主菜单：\n"
-    echo "提示：使用上下方向键↑↓选择，回车键Enter确认选项："
-    echo -e "\n请选择菜单：\n"
+    draw_line_blank "="
+    text_blank "FFmpeg批处理工具主菜单"
+    text_blank "提示：使用上下方向键↑↓选择，回车键Enter确认选项"
+    text_blank "请选择菜单："
     arrow_select_option "${main_menu_options_array[@]}"
     choice=$?
     case ${main_menu_options_array[$choice]} in

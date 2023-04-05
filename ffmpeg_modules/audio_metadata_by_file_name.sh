@@ -27,7 +27,7 @@ audio_metadata_by_file_name() {
     local operation_count=0 no_good_name_count=0
     shopt -s nullglob
     local audio_title audio_artist file_name
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" $(("$operation_count" + "$no_good_name_count"))
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         file_name=$(get_file_name "$file")
@@ -37,8 +37,8 @@ audio_metadata_by_file_name() {
             ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_title" -metadata artist="$audio_artist" "$output_path/$file"
             ((operation_count++))
         else
-            # draw_line_echo "~"
-            # text_echo "「$file」文件名格式不符合要求，无法修改内部元数据标签"
+            # draw_line_blank "~"
+            # text_blank "「$file」文件名格式不符合要求，无法修改内部元数据标签"
             ((no_good_name_count++))
         fi
         show_progress_bar "$all_count" $(("$operation_count" + "$no_good_name_count"))

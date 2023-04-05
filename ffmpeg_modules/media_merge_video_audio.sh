@@ -39,10 +39,10 @@ media_merge_video_audio() {
             input_video="$file"
         done
     else
-        draw_line_echo "-"
-        text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-        text_echo "当前路径下检测到多个视频文件"
-        text_echo "现在进入手动选择视频文件模式，请选择需要合并的视频文件："
+        draw_line_blank "-"
+        text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+        text_blank "当前路径下检测到多个视频文件"
+        text_blank "现在进入手动选择视频文件模式，请选择需要合并的视频文件："
         local -a video_file_array=()
         if [ "$mp4_count" -ne 0 ]; then
             video_file_array+=(*.mp4)
@@ -86,10 +86,10 @@ media_merge_video_audio() {
             fi
         done
         if [ "$check_name_flag" = false ]; then
-            draw_line_echo "-"
-            text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-            text_echo "当前路径下检测到多个音频文件，但并未检测到和「$input_video」同名的音频文件"
-            text_echo "现在进入手动选择音频文件模式，请选择需要合并的音频文件："
+            draw_line_blank "-"
+            text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+            text_blank "当前路径下检测到多个音频文件，但并未检测到和「$input_video」同名的音频文件"
+            text_blank "现在进入手动选择音频文件模式，请选择需要合并的音频文件："
             local -a audio_file_array=()
             if [ "$mp3_count" -ne 0 ]; then
                 audio_file_array+=(*.mp3)
@@ -114,7 +114,7 @@ media_merge_video_audio() {
     log_start
     make_directory "$output_path"
     local operation_count=0
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -i "$input_video" -i "$input_audio" -c copy "$output_path/$(lowercase_file_name_extension "$input_video")"
     ((operation_count++))

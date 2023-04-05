@@ -9,17 +9,17 @@ process_image_sequence() {
         if [[ "$file_name" =~ ^[0-9]+$ ]]; then
             image_sequence_flag=true
             file_name_length=$(get_string_length "$file_name")
-            text_echo "当前检测到$1图片序列，文件名长度为$file_name_length，文件数量为$2" >&2
+            text_blank "当前检测到$1图片序列，文件名长度为$file_name_length，文件数量为$2" >&2
         else
             image_sequence_flag=false
-            text_echo "当前检测到$2个$1文件，但不符合图片序列命名要求，已退出本次的功能操作" >&2
+            text_blank "当前检测到$2个$1文件，但不符合图片序列命名要求，已退出本次的功能操作" >&2
         fi
         break
     done
     file_name_for_ffmpeg="%0${file_name_length}d.$1"
     result+=("$image_sequence_flag")
     result+=("$file_name_for_ffmpeg")
-    echo "${result[@]}"
+    printf "%s " "${result[@]}"
 }
 
 personal_work_sequence2video() {
@@ -41,7 +41,7 @@ personal_work_sequence2video() {
 
     if [ "$png_count" -lt 24 ] && [ "$jpg_count" -lt 24 ] && [ "$jpeg_count" -lt 24 ]; then
         image_sequence_flag=false
-        echo "当前并未检测到png图片序列或者jpg图片序列或者jpeg图片序列，已退出本次的功能操作"
+        text_blank "当前并未检测到png图片序列或者jpg图片序列或者jpeg图片序列，已退出本次的功能操作"
     fi
 
     local process_result input_file image_sequence_flag
@@ -102,7 +102,7 @@ personal_work_sequence2video() {
     video_max_bitrate_number=$(printf "%.2f" "$video_max_bitrate_number")
     video_max_bitrate_number=$(remove_last_zero "$video_max_bitrate_number")
     video_max_bitrate="${video_max_bitrate_number}${video_max_bitrate_unit}"
-    video_bufsize_number=$(echo "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
+    video_bufsize_number=$(printf "%s" "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
     video_bufsize_number=$(remove_last_zero "$video_bufsize_number")
     video_bufsize="${video_bufsize_number}${video_max_bitrate_unit}"
 
@@ -119,8 +119,8 @@ personal_work_sequence2video() {
         return 20
     fi
 
-    draw_line_echo "-"
-    text_echo "当前已设置压制视频的帧率为「$sequence_video_fps」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
+    draw_line_blank "-"
+    text_blank "当前已设置压制视频的帧率为「$sequence_video_fps」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
 
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)
@@ -133,7 +133,7 @@ personal_work_sequence2video() {
     log_start
     detect_and_remove "file" "output.mp4"
     local operation_count=0
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -r "$sequence_video_fps" -f image2 -i "$input_file" -r "$sequence_video_fps" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" "output.mp4"
     ((operation_count++))

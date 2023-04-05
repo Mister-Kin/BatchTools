@@ -21,7 +21,7 @@ video_converter_flv2mp4() {
     log_start
     local operation_count=0
     shopt -s nullglob
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "flv"); do
         detect_and_remove "file" "${file%.*}.mp4"

@@ -6,109 +6,176 @@ draw_line() {
     printf %"$(tput cols)"s | tr " " "$1"
 }
 
-echo_draw_line() {
-    echo
+blank_draw_line() {
+    printf "\n"
     draw_line "$1"
 }
 
-draw_line_echo() {
+draw_line_blank() {
     draw_line "$1"
-    echo -e "\n"
+    printf "\n\n"
 }
 
-echo_draw_line_echo() {
-    echo
+blank_draw_line_blank() {
+    printf "\n"
     draw_line "$1"
-    echo -e "\n"
+    printf "\n\n"
 }
 
-echo_text() {
-    echo -e "\n"
-    echo "$1"
+blank_text() {
+    printf "%b" "\n\n$1\n"
 }
 
-echo_text_normal() {
-    echo
-    echo "$1"
+blank_text_normal() {
+    printf "%b" "\n$1\n"
 }
 
-text_echo() {
-    echo "$1"
-    echo
+text_blank() {
+    printf "%b" "$1\n\n"
 }
 
-echo_text_echo() {
-    echo -e "\n"
-    echo "$1"
-    echo
+blank_text_blank() {
+    printf "%b" "\n\n$1\n\n"
 }
 
-echo_text_echo_normal() {
-    echo
-    echo "$1"
-    echo
+blank_text_blank_normal() {
+    printf "%b" "\n$1\n\n"
 }
 
 set_color() {
     case "$1" in
     "black")
-        echo -n "$(tput setaf 0)"
+        printf "%s" "$(tput setaf 0)"
         ;;
     "red")
-        echo -n "$(tput setaf 1)"
+        printf "%s" "$(tput setaf 1)"
         ;;
     "green")
-        echo -n "$(tput setaf 2)"
+        printf "%s" "$(tput setaf 2)"
         ;;
     "yellow")
-        echo -n "$(tput setaf 3)"
+        printf "%s" "$(tput setaf 3)"
         ;;
     "blue")
-        echo -n "$(tput setaf 4)"
+        printf "%s" "$(tput setaf 4)"
         ;;
     "magenta")
-        echo -n "$(tput setaf 5)"
+        printf "%s" "$(tput setaf 5)"
         ;;
     "cyan")
-        echo -n "$(tput setaf 6)"
+        printf "%s" "$(tput setaf 6)"
         ;;
     "white")
-        echo -n "$(tput setaf 7)"
+        printf "%s" "$(tput setaf 7)"
         ;;
     "reset")
-        echo -n "$(tput sgr0)"
-        return 0
+        printf "%s" "$(tput sgr0)"
         ;;
     esac
     if [ $# -eq 2 ]; then
-        echo -n "$2$(tput sgr0)"
+        printf "%s" "$2$(tput sgr0)"
     fi
 }
 
 lowercase_to_uppercase() {
-    echo "$1" | tr '[:lower:]' '[:upper:]'
+    printf "%s" "$1" | tr '[:lower:]' '[:upper:]'
 }
 
 uppercase_to_lowercase() {
-    echo "$1" | tr '[:upper:]' '[:lower:]'
+    printf "%s" "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+# 获取任意位置的字符
+# ${str:position:length}
+# position仅指明位置，为负数时，则从尾部数起。例如-1就是指倒数第一个位置。
+# length：指定长度，从左往右计算长度。
+get_any_char() {
+    printf "%s" "${1:$2:$3}"
+}
+
+# 获取首个字符
+# ${str:0:1}可简写为${str::1}
+get_first_char() {
+    printf "%s" "${1::1}"
+}
+
+# 获取前面任意个字符
+get_first_any_char() {
+    printf "%s" "${1::$2}"
+}
+
+# 获取最后一个字符
+get_last_char() {
+    printf "%s" "${1: -1}"
+}
+
+# 获取最后任意个字符
+get_last_any_char() {
+    printf "%s" "${1: -$2}"
+}
+
+# 删除首个字符
+remove_first_char() {
+    printf "%s" "${1:1}"
+}
+
+# 删除前面任意个字符
+remove_first_any_char() {
+    printf "%s" "${1:$2}"
+}
+
+# 删除最后一个字符
+remove_last_char() {
+    printf "%s" "${1::-1}"
+}
+
+# 删除最后任意个字符
+remove_last_any_char() {
+    printf "%s" "${1::-$2}"
+}
+
+get_string_length() {
+    printf "%s" "${#1}"
+}
+
+remove_after_first_delimiter() {
+    printf "%s" "${1%%"$2"*}"
+}
+
+remove_after_last_delimiter() {
+    printf "%s" "${1%"$2"*}"
+}
+
+remove_before_first_delimiter() {
+    printf "%s" "${1#*"$2"}"
+}
+
+remove_before_last_delimiter() {
+    printf "%s" "${1##*"$2"}"
+}
+
+get_file_name() {
+    printf "%s" "$(remove_after_last_delimiter "$1" ".")"
+}
+
+get_file_extension() {
+    printf "%s" "$(remove_before_last_delimiter "$1" ".")"
 }
 
 description() {
-    echo_draw_line_echo "="
-    text_echo "功能名称：$1"
+    blank_draw_line_blank "="
+    text_blank "功能名称：$1"
     local text
     text="${2//；/\\n\\t}"
-    echo -e "功能介绍：$text"
-    echo
+    printf "%b" "功能介绍：$text\n\n"
     if [ $# -eq 3 ]; then
         text="${3//；/\\n\\t}"
-        echo -e "注意事项：$text"
-        echo
+        printf "%b" "注意事项：$text\n\n"
     fi
 }
 
 description_append_intro() {
-    echo -e -n "\n\n功能参数：$(set_color "blue")$1$(set_color "reset")"
+    printf "%b" "\n\n功能参数：$(set_color "blue")$1$(set_color "reset")"
 }
 
 # 函数: description_append_note，补充description函数的注意事项小节
@@ -167,12 +234,12 @@ description_append_note() {
             fi
         fi
     fi
-    echo -n "$(set_color "red" "生成的文件输出$hint_text_path当前路径下$hint_text_type_prefix的$hint_text_name")；$hint_text_append请先确保路径下没有同名的$hint_text_name，否则本功能操作将$(set_color "red" "强制删除")同名文件$hint_text_type并重新生成；如果路径下已有同名的$hint_text_name，请先自行处理好相关文件再执行该功能"
+    printf "%s" "$(set_color "red" "生成的文件输出$hint_text_path当前路径下$hint_text_type_prefix的$hint_text_name")；$hint_text_append请先确保路径下没有同名的$hint_text_name，否则本功能操作将$(set_color "red" "强制删除")同名文件$hint_text_type并重新生成；如果路径下已有同名的$hint_text_name，请先自行处理好相关文件再执行该功能"
 }
 
 log_start() {
-    draw_line_echo "-"
-    text_echo "已开始本次的功能操作"
+    draw_line_blank "-"
+    text_blank "已开始本次的功能操作"
 }
 
 log_end() {
@@ -184,23 +251,22 @@ log_end() {
             log_end_append="\n\n$3"
         fi
     fi
-    draw_line_echo "~"
-    echo -e "已结束本次的功能操作：\n\n总共执行了$1次操作（当前路径检测到$2个可操作文件）$log_end_append"
-    echo
+    draw_line_blank "~"
+    printf "%b" "已结束本次的功能操作：\n\n总共执行了$1次操作（当前路径检测到$2个可操作文件）$log_end_append\n\n"
 }
 
 log_result() {
-    draw_line_echo "-"
+    draw_line_blank "-"
     local result_text
     if [ $# -eq 1 ]; then
         result_text="$1"
     else
         result_text=$(description_append_note "$@")
     fi
-    echo "${result_text%%；*}"
+    printf "%b" "$(remove_after_first_delimiter "$result_text" "；")\n"
     # 「cd ~-」回到上一工作路径，和「cd -」效果一样，但不会输出切换后的新路径到标准输出STDOUT中。如果cd失败就结束函数。
     cd ~- || return
-    echo_text_normal "当前已切换回上一次的工作路径「$PWD」"
+    blank_text_normal "当前已切换回上一次的工作路径「$PWD」"
 }
 
 log_file_not_detected() {
@@ -221,61 +287,69 @@ log_file_not_detected() {
         fi
     fi
     draw_line "-"
-    echo_text "由于当前路径并未检测到任何$detected_text，已退出本次的功能操作"
+    blank_text "由于当前路径并未检测到任何$detected_text，已退出本次的功能操作"
 }
 
-# Renders a text based list of options that can be selected by the
-# user using up, down and enter keys and returns the chosen option.
-#   Arguments   : list of options, maximum of 256
-#                 "opt1" "opt2" ...
-#   Return value: selected index (0 for opt1, 1 for opt2 ...)
+# 使用传入的数组值绘制菜单：使用上下方向键和enter回车键确认选择
+# 参数：数组，传入的数组数量最大可为256
+# 返回值：返回选项的索引值
+ESC=$(printf "\033")
+arrow_select_option_cursor_blink_on() {
+    printf "%s" "${ESC}[?25h"
+}
+arrow_select_option_cursor_blink_off() {
+    printf "%s" "${ESC}[?25l"
+}
+arrow_select_option_cursor_to() {
+    printf "%s" "${ESC}[$1;${2:-1}H"
+}
+arrow_select_option_print_option() {
+    printf "%s" "     $1"
+}
+arrow_select_option_print_selected() {
+    printf "%s" "     ${ESC}[7m$1${ESC}[27m"
+}
+arrow_select_option_get_cursor_row() {
+    IFS=';' read -sdR -r -p $'\E[6n' ROW COL
+    printf "%s" "$(remove_before_first_delimiter "$ROW" "[")"
+}
+arrow_select_option_key_input() {
+    read -s -n3 -r key 2>/dev/null >&2
+    if [[ "$key" = "${ESC}[A" ]]; then
+        printf up
+    fi
+    if [[ "$key" = "${ESC}[B" ]]; then
+        printf down
+    fi
+    if [[ "$key" = "" ]]; then
+        printf enter
+    fi
+}
 arrow_select_option() {
-
-    # little helpers for terminal print control and key input
-    ESC=$(printf "\033")
-    cursor_blink_on() { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to() { printf "$ESC[$1;${2:-1}H"; }
-    print_option() { printf "     $1"; }
-    print_selected() { printf "     $ESC[7m$1$ESC[27m"; }
-    get_cursor_row() {
-        IFS=';' read -sdR -p $'\E[6n' ROW COL
-        echo ${ROW#*[}
-    }
-    key_input() {
-        read -s -n3 key 2>/dev/null >&2
-        if [[ $key = $ESC[A ]]; then echo up; fi
-        if [[ $key = $ESC[B ]]; then echo down; fi
-        if [[ $key = "" ]]; then echo enter; fi
-    }
-
     # initially print empty new lines (scroll down if at bottom of screen)
     for opt; do printf "\n"; done
-
     # determine current screen position for overwriting the options
-    local lastrow=$(get_cursor_row)
-    local startrow=$(($lastrow - $#))
-
+    local lastrow startrow
+    lastrow=$(arrow_select_option_get_cursor_row)
+    startrow=$(("$lastrow" - $#))
     # ensure cursor and input echoing back on upon a ctrl+c during read -s
-    trap "cursor_blink_on; stty echo; printf '\n'; exit" 2
-    cursor_blink_off
-
+    trap "arrow_select_option_cursor_blink_on; stty echo; printf '\n'; exit" 2
+    arrow_select_option_cursor_blink_off
     local selected=0
     while true; do
         # print options by overwriting the last lines
         local idx=0
         for opt; do
-            cursor_to $(($startrow + $idx))
+            arrow_select_option_cursor_to $(("$startrow" + "$idx"))
             if [ $idx -eq $selected ]; then
-                print_selected "$opt"
+                arrow_select_option_print_selected "$opt"
             else
-                print_option "$opt"
+                arrow_select_option_print_option "$opt"
             fi
             ((idx++))
         done
-
         # user key control
-        case $(key_input) in
+        case $(arrow_select_option_key_input) in
         enter) break ;;
         up)
             ((selected--))
@@ -287,12 +361,10 @@ arrow_select_option() {
             ;;
         esac
     done
-
     # cursor position back to normal
-    cursor_to $lastrow
+    arrow_select_option_cursor_to "$lastrow"
     printf "\n"
-    cursor_blink_on
-
+    arrow_select_option_cursor_blink_on
     return $selected
 }
 
@@ -311,89 +383,12 @@ file_extension_for_loop() {
             fi
         fi
     fi
-    echo "$file_extension"
-}
-
-# 获取任意位置的字符
-# ${str:position:length}
-# position仅指明位置，为负数时，则从尾部数起。例如-1就是指倒数第一个位置。
-# length：指定长度，从左往右计算长度。
-get_any_char() {
-    echo "${1:$2:$3}"
-}
-
-# 获取首个字符
-# ${str:0:1}可简写为${str::1}
-get_first_char() {
-    echo "${1::1}"
-}
-
-# 获取前面任意个字符
-get_first_any_char() {
-    echo "${1::$2}"
-}
-
-# 获取最后一个字符
-get_last_char() {
-    echo "${1: -1}"
-}
-
-# 获取最后任意个字符
-get_last_any_char() {
-    echo "${1: -$2}"
-}
-
-# 删除首个字符
-remove_first_char() {
-    echo "${1:1}"
-}
-
-# 删除前面任意个字符
-remove_first_any_char() {
-    echo "${1:$2}"
-}
-
-# 删除最后一个字符
-remove_last_char() {
-    echo "${1::-1}"
-}
-
-# 删除最后任意个字符
-remove_last_any_char() {
-    echo "${1::-$2}"
-}
-
-get_string_length() {
-    echo "${#1}"
-}
-
-remove_after_first_delimiter() {
-    echo "${1%%$2*}"
-}
-
-remove_after_last_delimiter() {
-    echo "${1%$2*}"
-}
-
-remove_before_first_delimiter() {
-    echo "${1#*$2}"
-}
-
-remove_before_last_delimiter() {
-    echo "${1##*$2}"
-}
-
-get_file_name() {
-    echo "$(remove_after_last_delimiter "$1" ".")"
-}
-
-get_file_extension() {
-    echo "$(remove_before_last_delimiter "$1" ".")"
+    printf "%s" "$file_extension"
 }
 
 lowercase_file_name_extension() {
     local file="$1"
-    echo "$(get_file_name "$file").$(uppercase_to_lowercase "$(get_file_extension "$file")")"
+    printf "%s" "$(get_file_name "$file").$(uppercase_to_lowercase "$(get_file_extension "$file")")"
 }
 
 show_progress_bar() {
@@ -401,24 +396,24 @@ show_progress_bar() {
     total="$1"
     current="$2"
 
-    bar_size=$(($(tput cols) - 25))
+    bar_size=$(($(tput cols) - 24))
     bar_char_done="#"
     bar_char_todo="-"
     # calculate the progress in percentage
-    percent=$(echo $current $total | gawk '{ printf "%.2f", $1 / $2 * 100 }')
+    percent=$(printf "%s" "$current $total" | gawk '{ printf "%.2f", $1 / $2 * 100 }')
     # The number of done and todo characters
-    done_num=$(echo $bar_size $percent | gawk '{ printf "%.0f", $1 * $2 / 100 }')
-    todo_num=$(echo $bar_size $done_num | gawk '{ printf "%.0f", $1 - $2 }')
+    done_num=$(printf "%s" "$bar_size $percent" | gawk '{ printf "%.0f", $1 * $2 / 100 }')
+    todo_num=$(printf "%s" "$bar_size $done_num" | gawk '{ printf "%.0f", $1 - $2 }')
 
     # build the done and todo sub-bars
     done_sub_bar=$(printf "%${done_num}s" | tr " " "${bar_char_done}")
     todo_sub_bar=$(printf "%${todo_num}s" | tr " " "${bar_char_todo}")
 
     # output the bar
-    echo -ne "\r当前处理进度：[${done_sub_bar}${todo_sub_bar}] ${percent}%"
+    printf "%b" "\r当前处理进度：[${done_sub_bar}${todo_sub_bar}] ${percent}%"
 
-    if [ $total -eq $current ]; then
-        echo -e "\n"
+    if [ "$total" -eq "$current" ]; then
+        printf "\n\n"
     fi
 }
 
@@ -435,7 +430,7 @@ calc_last_letter_length() {
         copy_str=$(remove_last_char "$copy_str")
         ((unit_length++))
     done
-    echo "$unit_length"
+    printf "%d" "$unit_length"
 }
 
 remove_last_zero() {
@@ -454,7 +449,7 @@ remove_last_zero() {
             break
         fi
     done
-    echo "$copy_str"
+    printf "%s" "$copy_str"
 }
 
 remove_first_zero() {
@@ -471,5 +466,5 @@ remove_first_zero() {
             break
         fi
     done
-    echo "$copy_str"
+    printf "%s" "$copy_str"
 }

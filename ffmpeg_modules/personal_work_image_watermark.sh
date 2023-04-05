@@ -28,7 +28,7 @@ personal_work_image_watermark() {
     make_directory "$output_path1" "$output_path2"
     local operation_count=0
     shopt -s nullglob
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar $(("$all_count" * 2)) "$operation_count"
     for file in $(file_extension_for_loop "png"); do
         ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path1/$(get_file_name "$file").webp"

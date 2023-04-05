@@ -4,9 +4,9 @@ process_filter_type() {
     local extension
     extension=$(uppercase_to_lowercase "$(get_file_extension "$1")")
     if [ "$extension" = "ass" ]; then
-        echo "ass"
+        printf "ass"
     elif [ "$extension" = "srt" ]; then
-        echo "subtitles"
+        printf "subtitles"
     fi
 }
 
@@ -74,7 +74,7 @@ personal_work_add_subtitle() {
     video_max_bitrate_number=$(printf "%.2f" "$video_max_bitrate_number")
     video_max_bitrate_number=$(remove_last_zero "$video_max_bitrate_number")
     video_max_bitrate="${video_max_bitrate_number}${video_max_bitrate_unit}"
-    video_bufsize_number=$(echo "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
+    video_bufsize_number=$(printf "%s" "$video_max_bitrate_number" | gawk '{ printf "%.2f", $1 * 2 }')
     video_bufsize_number=$(remove_last_zero "$video_bufsize_number")
     video_bufsize="${video_bufsize_number}${video_max_bitrate_unit}"
 
@@ -91,8 +91,8 @@ personal_work_add_subtitle() {
         return 20
     fi
 
-    draw_line_echo "-"
-    text_echo "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
+    draw_line_blank "-"
+    text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
 
     shopt -s nullglob
 
@@ -102,10 +102,10 @@ personal_work_add_subtitle() {
             input_video="$file"
         done
     else
-        draw_line_echo "-"
-        text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-        text_echo "当前路径下检测到多个视频文件"
-        text_echo "现在进入手动选择视频模式，请选择需要添加字幕的视频："
+        draw_line_blank "-"
+        text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+        text_blank "当前路径下检测到多个视频文件"
+        text_blank "现在进入手动选择视频模式，请选择需要添加字幕的视频："
         local -a video_file_array=()
         if [ "$mp4_count" -ne 0 ]; then
             video_file_array+=(*.mp4)
@@ -151,10 +151,10 @@ personal_work_add_subtitle() {
             fi
         done
         if [ "$check_name_flag" = false ]; then
-            draw_line_echo "~"
-            text_echo "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-            text_echo "当前路径下检测到多个字幕文件，但未检测到和「$input_video」同名的字幕文件"
-            text_echo "现在进入手动选择字幕文件模式，请选择需要添加的字幕文件："
+            draw_line_blank "~"
+            text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+            text_blank "当前路径下检测到多个字幕文件，但未检测到和「$input_video」同名的字幕文件"
+            text_blank "现在进入手动选择字幕文件模式，请选择需要添加的字幕文件："
             local -a subtitle_file_array=()
             if [ "$ass_count" -ne 0 ]; then
                 subtitle_file_array+=(*.ass)
@@ -189,7 +189,7 @@ personal_work_add_subtitle() {
     log_start
     make_directory "$output_path"
     local operation_count=0
-    draw_line_echo "~"
+    draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
     ffmpeg_no_banner -i "$input_video" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "$output_path/$(lowercase_file_name_extension "$input_video")"
     ((operation_count++))
