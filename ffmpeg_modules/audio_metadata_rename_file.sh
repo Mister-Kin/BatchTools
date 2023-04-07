@@ -16,7 +16,7 @@ audio_metadata_rename_file() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    all_count=$((m4a_count + mp3_count + flac_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "m4a" "mp3" "flac"
         return 0
@@ -35,19 +35,17 @@ audio_metadata_rename_file() {
         audio_artist=$(get_media_info "$file" "format_tags=artist")
         output_file="$audio_title - $audio_artist.$(get_file_extension "$file")"
         if [ "$audio_title" = "" ] || [ "$audio_artist" = "" ]; then
-            # draw_line_blank "~"
-            # text_blank "「$file」内部没有元数据标签，无法完成重命名文件操作"
             ((no_metadate_count++))
         else
-            ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "$output_path/$output_file"
+            ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 "${output_path}/${output_file}"
             ((operation_count++))
         fi
-        show_progress_bar "$all_count" $(("$operation_count" + "$no_metadate_count"))
+        show_progress_bar "$all_count" "$((operation_count + no_metadate_count))"
     done
     if [ "$no_metadate_count" -eq 0 ]; then
         log_end "$operation_count" "$all_count"
     else
-        log_end "$operation_count" "$all_count" "有$no_metadate_count个音频文件内部没有元数据标签，无法完成重命名文件操作"
+        log_end "$operation_count" "$all_count" "有${no_metadate_count}个音频文件内部没有元数据标签，无法完成重命名文件操作"
     fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob

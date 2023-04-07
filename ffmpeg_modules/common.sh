@@ -8,7 +8,7 @@ ffmpeg_no_banner() {
 copyright_watermark() {
     local copyright_text="© Mr. Kin"
     local font_path="C\:\/Windows\/fonts\/SourceSans3-Semibold.otf"
-    local watermark_effect="split [main][tmp]; [tmp] drawtext=text='$copyright_text':fontfile='$font_path':fontcolor=white:fontsize=50:bordercolor=black:borderw=1.5:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
+    local watermark_effect="split [main][tmp]; [tmp] drawtext=text='${copyright_text}':fontfile='${font_path}':fontcolor=white:fontsize=50:bordercolor=black:borderw=1.5:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
     printf "%s" "$watermark_effect"
 }
 
@@ -26,11 +26,11 @@ filter_for_compress_with_copyright() {
     if [ "$1" = "png" ]; then
         local compress_png
         compress_png=$(filter_for_compress "png")
-        printf "%s" "$effect_copyright, $compress_png"
+        printf "%s" "${effect_copyright}, ${compress_png}"
     elif [ "$1" = "gif" ]; then
         local compress_gif
         compress_gif=$(filter_for_compress "gif")
-        printf "%s" "$effect_copyright, $compress_gif"
+        printf "%s" "${effect_copyright}, ${compress_gif}"
     fi
 }
 

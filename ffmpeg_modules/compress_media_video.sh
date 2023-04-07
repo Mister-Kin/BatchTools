@@ -16,7 +16,7 @@ compress_media_video() {
     mp4_count=$(file_count "mp4")
     flv_count=$(file_count "flv")
     mov_count=$(file_count "mov")
-    all_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
+    all_count=$((mp4_count + flv_count + mov_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "mp4" "flv" "mov"
         return 0
@@ -40,7 +40,7 @@ compress_media_video() {
     fi
 
     draw_line_blank "-"
-    text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的preset值为「$video_preset」，设置删除源文件为「$delete_source_files」"
+    text_blank "当前已设置压制视频的crf值为「${video_crf}」，设置压制视频的preset值为「${video_preset}」，设置删除源文件为「${delete_source_files}」"
 
     log_start
     make_directory "$output_path"
@@ -49,7 +49,7 @@ compress_media_video() {
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy -x265-params log-level=error "$output_path/$(get_file_name "$file").mp4"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy -x265-params log-level=error "${output_path}/$(get_file_name "$file").mp4"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

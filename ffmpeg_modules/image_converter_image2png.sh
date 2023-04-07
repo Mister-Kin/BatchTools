@@ -18,7 +18,7 @@ image_converter_image2png() {
     jpeg_count=$(file_count "jpeg")
     gif_count=$(file_count "gif")
     webp_count=$(file_count "webp")
-    all_count=$(("$tga" + "$jpg_count" + "$jpeg_count" + "$gif_count" + "$webp_count"))
+    all_count=$((tga + jpg_count + jpeg_count + gif_count + webp_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "tga" "jpg" "jpeg" "gif" "webp"
         return 0
@@ -31,7 +31,7 @@ image_converter_image2png() {
     fi
 
     draw_line_blank "-"
-    text_blank "当前已设置删除源文件为「$delete_source_files」"
+    text_blank "当前已设置删除源文件为「${delete_source_files}」"
 
     log_start
     make_directory "$output_path"
@@ -40,7 +40,7 @@ image_converter_image2png() {
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "tga" "jpg" "jpeg" "gif" "webp"); do
-        ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").png"
+        ffmpeg_no_banner -i "$file" "${output_path}/$(get_file_name "$file").png"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

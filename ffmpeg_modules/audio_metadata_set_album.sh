@@ -16,7 +16,7 @@ audio_metadata_set_album() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    all_count=$((m4a_count + mp3_count + flac_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "m4a" "mp3" "flac"
         return 0
@@ -29,7 +29,7 @@ audio_metadata_set_album() {
     fi
 
     draw_line_blank "-"
-    text_blank "当前已设置元数据标签-专辑名为「$audio_ablum」"
+    text_blank "当前已设置元数据标签-专辑名为「${audio_ablum}」"
 
     log_start
     make_directory "$output_path"
@@ -38,7 +38,7 @@ audio_metadata_set_album() {
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
-        ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata album="$audio_ablum" "$output_path/$file"
+        ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata album="$audio_ablum" "${output_path}/${file}"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

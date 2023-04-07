@@ -78,11 +78,11 @@ set_color() {
 }
 
 lowercase_to_uppercase() {
-    printf "%s" "$1" | tr '[:lower:]' '[:upper:]'
+    printf "%s" "$1" | tr "[:lower:]" "[:upper:]"
 }
 
 uppercase_to_lowercase() {
-    printf "%s" "$1" | tr '[:upper:]' '[:lower:]'
+    printf "%s" "$1" | tr "[:upper:]" "[:lower:]"
 }
 
 # 获取任意位置的字符
@@ -167,10 +167,10 @@ description() {
     text_blank "功能名称：$1"
     local text
     text="${2//；/\\n\\t}"
-    printf "%b" "功能介绍：$text\n\n"
+    printf "%b" "功能介绍：${text}\n\n"
     if [ $# -eq 3 ]; then
         text="${3//；/\\n\\t}"
-        printf "%b" "注意事项：$text\n\n"
+        printf "%b" "注意事项：${text}\n\n"
     fi
 }
 
@@ -196,13 +196,13 @@ description_append_note() {
         hint_text_type=""
         hint_text_type_prefix="同名"
         if [ $# -ge 4 ]; then
-            hint_text_name+="$hint_text_option$4文件"
+            hint_text_name+="${hint_text_option}$4文件"
             if [ $# -ge 5 ]; then
-                hint_text_name+="$hint_text_option$5文件"
+                hint_text_name+="${hint_text_option}$5文件"
                 if [ $# -ge 6 ]; then
-                    hint_text_name+="$hint_text_option$6文件"
+                    hint_text_name+="${hint_text_option}$6文件"
                     if [ $# -ge 7 ]; then
-                        hint_text_name+="$hint_text_option$7文件"
+                        hint_text_name+="${hint_text_option}$7文件"
                     fi
                 fi
             fi
@@ -215,26 +215,26 @@ description_append_note() {
             hint_text_append=""
             hint_text_name="「$3」文件夹"
             if [ $# -ge 4 ]; then
-                hint_text_name+="$hint_text_option「$4」文件夹"
+                hint_text_name+="${hint_text_option}「$4」文件夹"
             fi
         fi
         hint_text_path="在"
         hint_text_type="夹"
         hint_text_type_prefix=""
         if [ $# -ge 5 ]; then
-            hint_text_name+="$hint_text_option「$5」文件夹"
+            hint_text_name+="${hint_text_option}「$5」文件夹"
             if [ $# -ge 6 ]; then
-                hint_text_name+="$hint_text_option「$6」文件夹"
+                hint_text_name+="${hint_text_option}「$6」文件夹"
                 if [ $# -ge 7 ]; then
-                    hint_text_name+="$hint_text_option「$7」文件夹"
+                    hint_text_name+="${hint_text_option}「$7」文件夹"
                     if [ $# -ge 8 ]; then
-                        hint_text_name+="$hint_text_option「$8」文件夹"
+                        hint_text_name+="${hint_text_option}「$8」文件夹"
                     fi
                 fi
             fi
         fi
     fi
-    printf "%s" "$(set_color "red" "生成的文件输出$hint_text_path当前路径下$hint_text_type_prefix的$hint_text_name")；$hint_text_append请先确保路径下没有同名的$hint_text_name，否则本功能操作将$(set_color "red" "强制删除")同名文件$hint_text_type并重新生成；如果路径下已有同名的$hint_text_name，请先自行处理好相关文件再执行该功能"
+    printf "%s" "$(set_color "red" "生成的文件输出${hint_text_path}当前路径下${hint_text_type_prefix}的${hint_text_name}")；${hint_text_append}请先确保路径下没有同名的${hint_text_name}，否则本功能操作将$(set_color "red" "强制删除")同名文件${hint_text_type}并重新生成；如果路径下已有同名的${hint_text_name}，请先自行处理好相关文件再执行该功能"
 }
 
 log_start() {
@@ -243,16 +243,17 @@ log_start() {
 }
 
 log_end() {
-    local log_end_append=""
+    local log_end_append="" text=""
     if [ $# -eq 3 ]; then
         if [[ "$3" =~ (^[1-9][0-9]*$) ]]; then
             log_end_append="\n\n总共删除了$3个源文件"
         else
-            log_end_append="\n\n$3"
+            text="${3//；/\\n\\t}"
+            log_end_append="\n\n${text}"
         fi
     fi
     draw_line_blank "~"
-    printf "%b" "已结束本次的功能操作：\n\n总共执行了$1次操作（当前路径检测到$2个可操作文件）$log_end_append\n\n"
+    printf "%b" "已结束本次的功能操作：\n\n总共执行了$1次操作（当前路径检测到$2个可操作文件）${log_end_append}\n\n"
 }
 
 log_result() {
@@ -266,11 +267,12 @@ log_result() {
     printf "%b" "$(remove_after_first_delimiter "$result_text" "；")\n"
     # 「cd ~-」回到上一工作路径，和「cd -」效果一样，但不会输出切换后的新路径到标准输出STDOUT中。如果cd失败就结束函数。
     cd ~- || return
-    blank_text_normal "当前已切换回上一次的工作路径「$PWD」"
+    blank_text_normal "当前已切换回上一次的工作路径「${PWD}」"
 }
 
 log_file_not_detected() {
-    local detected_text="$1文件"
+    local detected_text
+    detected_text="$1文件"
     if [ $# -ge 2 ]; then
         detected_text+="、$2文件"
         if [ $# -ge 3 ]; then
@@ -287,7 +289,7 @@ log_file_not_detected() {
         fi
     fi
     draw_line "-"
-    blank_text "由于当前路径并未检测到任何$detected_text，已退出本次的功能操作"
+    blank_text "由于当前路径并未检测到任何${detected_text}，已退出本次的功能操作"
 }
 
 # 使用传入的数组值绘制菜单：使用上下方向键和enter回车键确认选择
@@ -331,7 +333,7 @@ arrow_select_option() {
     # determine current screen position for overwriting the options
     local lastrow startrow
     lastrow=$(arrow_select_option_get_cursor_row)
-    startrow=$(("$lastrow" - $#))
+    startrow=$((lastrow - $#))
     # ensure cursor and input echoing back on upon a ctrl+c during read -s
     trap "arrow_select_option_cursor_blink_on; stty echo; printf '\n'; exit" 2
     arrow_select_option_cursor_blink_off
@@ -340,7 +342,7 @@ arrow_select_option() {
         # print options by overwriting the last lines
         local idx=0
         for opt; do
-            arrow_select_option_cursor_to $(("$startrow" + "$idx"))
+            arrow_select_option_cursor_to $((startrow + idx))
             if [ $idx -eq $selected ]; then
                 arrow_select_option_print_selected "$opt"
             else

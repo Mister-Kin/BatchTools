@@ -16,7 +16,7 @@ compress_media_image() {
     jpg_count=$(file_count "jpg")
     jpeg_count=$(file_count "jpeg")
     gif_count=$(file_count "gif")
-    all_count=$(("$png_count" + "$jpg_count" + "$jpeg_count" + "$gif_count"))
+    all_count=$((png_count + jpg_count + jpeg_count + gif_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "png" "jpg" "jpeg" "gif"
         return 0
@@ -34,7 +34,7 @@ compress_media_image() {
     fi
 
     draw_line_blank "-"
-    text_blank "当前已设置转换成webp格式为「$webp_flag」，设置删除源文件为「$delete_source_files」"
+    text_blank "当前已设置转换成webp格式为「${webp_flag}」，设置删除源文件为「${delete_source_files}」"
 
     log_start
     local operation_count=0 delete_count=0
@@ -46,17 +46,17 @@ compress_media_image() {
         draw_line_blank "~"
         show_progress_bar "$all_count" "$operation_count"
         for file in $(file_extension_for_loop "jpg" "jpeg"); do
-            ffmpeg_no_banner -i "$file" "$output_path/$(lowercase_file_name_extension "$file")"
+            ffmpeg_no_banner -i "$file" "${output_path}/$(lowercase_file_name_extension "$file")"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
         for file in $(file_extension_for_loop "png"); do
-            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "$output_path/$(lowercase_file_name_extension "$file")"
+            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "${output_path}/$(lowercase_file_name_extension "$file")"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
         for file in $(file_extension_for_loop "gif"); do
-            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "gif")" "$output_path/$(lowercase_file_name_extension "$file")"
+            ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress "gif")" "${output_path}/$(lowercase_file_name_extension "$file")"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
@@ -65,7 +65,7 @@ compress_media_image() {
         make_directory "$output_path"
         draw_line_blank "~"
         for file in $(file_extension_for_loop "png" "jpg" "jpeg" "gif"); do
-            ffmpeg_no_banner -i "$file" "$output_path/$(get_file_name "$file").webp"
+            ffmpeg_no_banner -i "$file" "${output_path}/$(get_file_name "$file").webp"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done

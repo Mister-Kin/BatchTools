@@ -16,7 +16,7 @@ merge_text_file_join() {
     local txt_count srt_count all_count
     txt_count=$(file_count "txt")
     srt_count=$(file_count "srt")
-    all_count=$(("$srt_count" + "$txt_count"))
+    all_count=$((srt_count + txt_count))
 
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "srt" "txt"

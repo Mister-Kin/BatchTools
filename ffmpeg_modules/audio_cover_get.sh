@@ -16,7 +16,7 @@ audio_cover_get() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    all_count=$((m4a_count + mp3_count + flac_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "m4a" "mp3" "flac"
         return 0
@@ -32,19 +32,17 @@ audio_cover_get() {
     for file in $(file_extension_for_loop "mp3" "m4a" "flac"); do
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
         if [ "$media_stream_number" -eq 2 ]; then
-            ffmpeg_no_banner -i "$file" -an -c:v copy "$output_path/$(get_file_name "$file").png"
+            ffmpeg_no_banner -i "$file" -an -c:v copy "${output_path}/$(get_file_name "$file").png"
             ((operation_count++))
         else
-            # draw_line_blank "~"
-            # text_blank "「$file」文件内部没有封面图，无法获取音频封面图"
             ((no_cover_count++))
         fi
-        show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))
+        show_progress_bar "$all_count" "$((operation_count + no_cover_count))"
     done
     if [ "$no_cover_count" -eq 0 ]; then
         log_end "$operation_count" "$all_count"
     else
-        log_end "$operation_count" "$all_count" "有$no_cover_count个音频文件内部没有封面图，无法获取音频封面图"
+        log_end "$operation_count" "$all_count" "有${no_cover_count}个音频文件内部没有封面图，无法获取音频封面图"
     fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob

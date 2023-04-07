@@ -15,7 +15,7 @@ personal_work_sequence2video_nvenc() {
     local all_count png_count jpg_count
     png_count=$(file_count "png")
     jpg_count=$(file_count "jpg")
-    all_count=$(("$png_count" + "$jpg_count"))
+    all_count=$((png_count + jpg_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "png" "jpg"
         return 0
@@ -51,9 +51,9 @@ personal_work_sequence2video_nvenc() {
     log_start
     make_directory "$output_path"
     if [ "$png_count" -gt 0 ]; then
-        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -r 24 -f image2 -i %0"$name_length"d.png -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "$output_path/output.mp4"
+        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -r 24 -f image2 -i %0"$name_length"d.png -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "${output_path}/output.mp4"
     else
-        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -c:v mjpeg_cuvid -r 24 -f image2 -i %0"$name_length"d.jpg -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "$output_path/output.mp4"
+        ffmpeg_no_banner -hwaccel cuda -hwaccel_output_format cuda -c:v mjpeg_cuvid -r 24 -f image2 -i %0"$name_length"d.jpg -r 24 -c:v h264_nvenc -profile:v high -preset:v slow -rc:v vbr -cq:v 19 -b:v "$video_bitrate" -maxrate:v "$video_maxrate" "${output_path}/output.mp4"
     fi
 
     log_end "1" "$all_count"

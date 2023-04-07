@@ -9,13 +9,13 @@ input_bool() {
     local user_input user_input_hint user_input_default_value_hint user_input_range_hint
     local bool_value
     user_input_default_value_hint="$2"
-    user_input_hint="$1（$user_input_default_value_hint）："
+    user_input_hint="$1（${user_input_default_value_hint}）："
     user_input_range_hint="允许输入「是/否/1/0/yes/no/y/n」，不区分大小写"
     text_blank "提示：输入00并回车，则终止操作并返回菜单" >&2
-    text_blank "提示：不输入（等待30秒）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
+    text_blank "提示：不输入（等待30秒）或直接回车，则${user_input_default_value_hint}（${user_input_range_hint}）" >&2
     if read -e -t 30 -r -p "$user_input_hint" user_input; then
         while ! [[ "$user_input" =~ (^$|^00$|^[01]$|^[YyNn]$|^[Yy][Ee][Ss]$|^[Nn][Oo]$) ]] && [ "$user_input" != "是" ] && [ "$user_input" != "否" ]; do
-            blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")$user_input_range_hint。" >&2
+            blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")${user_input_range_hint}。" >&2
             if ! read -e -t 30 -r -p "$user_input_hint" user_input; then
                 printf "\n" >&2
                 bool_value="$3"
@@ -56,13 +56,13 @@ input_number() {
     local user_input user_input_hint user_input_default_value_hint user_input_range_hint
     local number_value
     user_input_default_value_hint="$2"
-    user_input_hint="$1（$user_input_default_value_hint）："
+    user_input_hint="$1（${user_input_default_value_hint}）："
     user_input_range_hint="$3"
     text_blank "提示：输入00并回车，则终止操作并返回菜单" >&2
-    text_blank "提示：不输入（等待30秒）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
+    text_blank "提示：不输入（等待30秒）或直接回车，则${user_input_default_value_hint}（${user_input_range_hint}）" >&2
     if read -e -t 30 -r -p "$user_input_hint" user_input; then
         while ! [[ "$user_input" =~ $5 ]]; do # 传递正则表达式参数，不用加双引号
-            blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")$user_input_range_hint。" >&2
+            blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")${user_input_range_hint}。" >&2
             if ! read -e -t 30 -r -p "$user_input_hint" user_input; then
                 printf "\n" >&2
                 number_value="$4"
@@ -95,10 +95,10 @@ input_number_waiting_user() {
     user_input_hint="$1："
     user_input_range_hint="$2"
     text_blank "提示：输入00并回车，则终止操作并返回菜单" >&2
-    text_blank "提示：$user_input_range_hint。" >&2
+    text_blank "提示：${user_input_range_hint}。" >&2
     read -e -r -p "$user_input_hint" user_input
     while ! [[ "$user_input" =~ $3 ]]; do # 传递正则表达式参数，不用加双引号
-        blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")$user_input_range_hint。" >&2
+        blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")${user_input_range_hint}。" >&2
         read -e -r -p "$user_input_hint" user_input
     done
     if [ "$user_input" = "00" ]; then
@@ -127,10 +127,10 @@ input_string() {
     local string_to_array=($input_string) # 使用圆括号重新定义变回数组，不能加双引号，否则定义失败导致仍是字符串
     local found_flag=0
     user_input_default_value_hint="$2"
-    user_input_hint="$1（$user_input_default_value_hint）："
+    user_input_hint="$1（${user_input_default_value_hint}）："
     user_input_range_hint="$3"
     text_blank "提示：输入00并回车，则终止操作并返回菜单" >&2
-    text_blank "提示：不输入（等待30秒）或直接回车，则$user_input_default_value_hint（$user_input_range_hint）" >&2
+    text_blank "提示：不输入（等待30秒）或直接回车，则${user_input_default_value_hint}（${user_input_range_hint}）" >&2
     if read -e -t 30 -r -p "$user_input_hint" user_input; then
         while ! [ $found_flag -eq 1 ] || ! [[ "$user_input" =~ $6 ]]; do
             if [ "$user_input" = "00" ]; then
@@ -147,7 +147,7 @@ input_string() {
                         break 2
                     fi
                 done
-                blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")$user_input_range_hint。" >&2
+                blank_text_blank_normal "$(set_color "red")当前输入错误，请重新输入。$(set_color "reset")${user_input_range_hint}。" >&2
                 if ! read -e -t 30 -r -p "$user_input_hint" user_input; then
                     printf "\n" >&2
                     string_value="$4"

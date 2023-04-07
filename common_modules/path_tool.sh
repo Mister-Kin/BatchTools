@@ -31,7 +31,7 @@ change_directory() {
             return 10
         fi
     done
-    blank_text_blank_normal "工作路径已切换到「$path」"
+    blank_text_blank_normal "工作路径已切换到「${path}」"
 }
 
 make_directory() {
@@ -65,17 +65,16 @@ file_count() {
     local file_lowercase_count=${#file_lowercase[@]}
     local file_uppercase_count=${#file_uppercase[@]}
     local all_count
-    all_count=$(("$file_lowercase_count" + "$file_uppercase_count"))
-    local count="$all_count"
+    all_count=$((file_lowercase_count + file_uppercase_count))
     if [ "$file_lowercase_count" -gt 0 ] || [ "$file_uppercase_count" -gt 0 ]; then
         # 临时重定向至STDERR，避免无关的printf命令影响函数的返回值
         draw_line_blank "-" >&2
         if [ "$file_lowercase_count" -gt 0 ]; then
-            printf "%b" "当前路径检测到$file_lowercase_count个$1文件\n\n" >&2
+            printf "%b" "当前路径检测到${file_lowercase_count}个$1文件\n\n" >&2
         fi
         if [ "$file_uppercase_count" -gt 0 ]; then
-            printf "%b" "当前路径检测到$file_uppercase_count个$file_uppercase_extension文件\n\n" >&2
+            printf "%b" "当前路径检测到${file_uppercase_count}个${file_uppercase_extension}文件\n\n" >&2
         fi
     fi
-    printf "%s" "$count"
+    printf "%d" "$all_count"
 }

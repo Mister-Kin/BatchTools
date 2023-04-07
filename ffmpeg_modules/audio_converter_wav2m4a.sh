@@ -27,7 +27,7 @@ audio_converter_wav2m4a() {
     audio_bitrate="${audio_bitrate}k"
 
     draw_line_blank "-"
-    text_blank "当前已设置压制音频的码率为「$audio_bitrate」"
+    text_blank "当前已设置压制音频的码率为「${audio_bitrate}」"
 
     log_start
     make_directory "$output_path"
@@ -36,7 +36,7 @@ audio_converter_wav2m4a() {
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "wav"); do
-        ffmpeg_no_banner -i "$file" -c:a libfdk_aac -b:a "$audio_bitrate" "$output_path/$(get_file_name "$file").m4a"
+        ffmpeg_no_banner -i "$file" -c:a libfdk_aac -b:a "$audio_bitrate" "${output_path}/$(get_file_name "$file").m4a"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done

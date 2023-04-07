@@ -9,7 +9,7 @@ process_image_sequence() {
         if [[ "$file_name" =~ ^[0-9]+$ ]]; then
             image_sequence_flag=true
             file_name_length=$(get_string_length "$file_name")
-            text_blank "当前检测到$1图片序列，文件名长度为$file_name_length，文件数量为$2" >&2
+            text_blank "当前检测到$1图片序列，文件名长度为${file_name_length}，文件数量为$2" >&2
         else
             image_sequence_flag=false
             text_blank "当前检测到$2个$1文件，但不符合图片序列命名要求，已退出本次的功能操作" >&2
@@ -37,7 +37,7 @@ personal_work_sequence2video() {
     png_count=$(file_count "png")
     jpg_count=$(file_count "jpg")
     jpeg_count=$(file_count "jpeg")
-    all_count=$(("$png_count" + "$jpg_count" + "$jpeg_count"))
+    all_count=$((png_count + jpg_count + jpeg_count))
 
     if [ "$png_count" -lt 24 ] && [ "$jpg_count" -lt 24 ] && [ "$jpeg_count" -lt 24 ]; then
         image_sequence_flag=false
@@ -120,7 +120,7 @@ personal_work_sequence2video() {
     fi
 
     draw_line_blank "-"
-    text_blank "当前已设置压制视频的帧率为「$sequence_video_fps」，设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置添加版权文字水印为「$watermark_flag」"
+    text_blank "当前已设置压制视频的帧率为「${sequence_video_fps}」，设置压制视频的crf值为「${video_crf}」，设置压制视频的最大码率为「${video_max_bitrate}」，设置压制视频的码率控制缓冲区大小为「${video_bufsize}」，设置压制视频的preset值为「${video_preset}」，设置添加版权文字水印为「${watermark_flag}」"
 
     local watermark_effect filter_effect
     watermark_effect=$(copyright_watermark)

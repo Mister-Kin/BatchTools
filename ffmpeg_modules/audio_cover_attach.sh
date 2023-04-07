@@ -11,34 +11,21 @@ check_image_good() {
         image_resolution_flag=true
     else
         image_resolution_flag=false
-        # draw_line_blank "~" >&2
-        # text_blank "当前选择的封面图「$1」宽高比不为1" >&2
-        # text_blank "这会导致生成的音频封面图非正方形" >&2
     fi
     if [ "$image_file_size" -lt "$mega_byte" ]; then
         file_size_flag=true
     else
         file_size_flag=false
-        local image_file_size_to_mega
-        image_file_size_to_mega=$(printf "%s" "$image_file_size" | gawk '{ printf "%.2f", $1 / 1024 /1024 }')
-        # draw_line_blank "~" >&2
-        # text_blank "当前选择的封面图「$1」文件大小为${image_file_size_to_mega}MB，已超过1MB" >&2
-        # text_blank "本程序将自动压缩封面图「$1」，生成临时文件再添加音频封面图" >&2
-        file_extension=$(uppercase_to_lowercase $(get_file_extension "$1"))
+        file_extension=$(uppercase_to_lowercase "$(get_file_extension "$1")")
         if [ "$file_extension" = "png" ]; then
             ffmpeg_no_banner -i "$1" -vf "$(filter_for_compress "png")" -pix_fmt pal8 "image_temp.png" >&2
         else
             ffmpeg_no_banner -i "$1" "image_temp.jpg" >&2
         fi
-        image_file_size=$(get_media_info "image_temp.$file_extension" "format=size")
-        image_file_size_to_kilo=$(printf "%s" "$image_file_size" | awk '{ printf "%.2f", $1 / 1024 }')
-        # draw_line_blank "~" >&2
-        # text_blank "已生成临时文件「image_temp.$file_extension」，文件大小为${image_file_size_to_kilo}KB" >&2
-        # text_blank "已完成压缩「$1」，从${image_file_size_to_mega}MB压缩到${image_file_size_to_kilo}KB" >&2
     fi
     result_array+=("$file_size_flag")
     result_array+=("$image_resolution_flag")
-    result_array+=("image_temp.$file_extension")
+    result_array+=("image_temp.${file_extension}")
     printf "%s " "${result_array[@]}"
 }
 
@@ -58,10 +45,10 @@ audio_cover_attach() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    audio_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    audio_count=$((m4a_count + mp3_count + flac_count))
     png_count=$(file_count "png")
     jpg_count=$(file_count "jpg")
-    image_count=$(("$png_count" + "$jpg_count"))
+    image_count=$((png_count + jpg_count))
     if [ "$audio_count" -eq 0 ] || [ "$image_count" -eq 0 ]; then
         if [ "$audio_count" -eq 0 ]; then
             log_file_not_detected "m4a" "mp3" "flac"
@@ -75,7 +62,7 @@ audio_cover_attach() {
 
     log_start
     make_directory "$output_path"
-    local operation_count=0 bad_resolution_count=0
+    local operation_count=0 bad_resolution_count=0 bad_file_size_count=0
     shopt -s nullglob
     local -a check_image_flag
     draw_line_blank "~"
@@ -86,17 +73,15 @@ audio_cover_attach() {
                 check_image_flag=($(check_image_good "$image_file"))
                 if [ "${check_image_flag[0]}" = false ]; then
                     image_file="${check_image_flag[2]}"
+                    ((bad_file_size_count++))
                 fi
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
+                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "${output_path}/${file}"
                 ((operation_count++))
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
-                    # draw_line_blank "~"
-                    # text_blank "已删除临时文件「${check_image_flag[2]}」"
-                    # draw_line_blank "~"
                 fi
             done
             show_progress_bar "$audio_count" "$operation_count"
@@ -113,17 +98,15 @@ audio_cover_attach() {
                     check_image_flag=($(check_image_good "$image_file"))
                     if [ "${check_image_flag[0]}" = false ]; then
                         image_file="${check_image_flag[2]}"
+                        ((bad_file_size_count++))
                     fi
                     if [ "${check_image_flag[1]}" = false ]; then
                         ((bad_resolution_count++))
                     fi
-                    ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
+                    ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "${output_path}/${file}"
                     ((operation_count++))
                     if [ "${check_image_flag[0]}" = false ]; then
                         rm -rf "${check_image_flag[2]}"
-                        # draw_line_blank "~"
-                        # text_blank "已删除临时文件「${check_image_flag[2]}」"
-                        # draw_line_blank "~"
                     fi
                     break
                 else
@@ -132,9 +115,9 @@ audio_cover_attach() {
             done
             if [ "$check_name_flag" = false ]; then
                 draw_line_blank "~"
-                text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-                text_blank "当前路径下检测到多张封面图，但未检测到和「$file」同名的封面图"
-                text_blank "现在进入手动选择封面图模式："
+                size_text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+                size_text_blank "当前路径下检测到多张封面图，但未检测到和「${file}」同名的封面图"
+                size_text_blank "现在进入手动选择封面图模式："
                 # 文件名可能含有空格，通过函数返回数组处理文件名十分麻烦，需额外添加分隔符处理分割字符块再重新数组化，因此不采用分离模块函数实现
                 local -a image_file_array=()
                 if [ "$png_count" -ne 0 ]; then
@@ -158,17 +141,15 @@ audio_cover_attach() {
                     image_file="${image_file_array[$choice]}"
                 else
                     image_file="${check_image_flag[2]}"
+                    ((bad_file_size_count++))
                 fi
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
-                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "$output_path/$file"
+                ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "${output_path}/${file}"
                 ((operation_count++))
                 if [ "${check_image_flag[0]}" = false ]; then
                     rm -rf "${check_image_flag[2]}"
-                    # draw_line_blank "~"
-                    # text_blank "已删除临时文件「${check_image_flag[2]}」"
-                    # draw_line_blank "~"
                 fi
             fi
             show_progress_bar "$audio_count" "$operation_count"
@@ -177,7 +158,17 @@ audio_cover_attach() {
     if [ "$bad_resolution_count" -eq 0 ]; then
         log_end "$operation_count" "$audio_count"
     else
-        log_end "$operation_count" "$audio_count" "其中生成的文件有$bad_resolution_count个因采用的封面图宽高比不为1，生成的封面图非正方形"
+        local size_text="" resolution_text="" separation_text=""
+        if [ "$bad_file_size_count" -ne 0 ]; then
+            size_text="其中有${bad_file_size_count}个因采用的封面图文件大小已超过1MB，本程序已自动进行压缩再合成封面图"
+        fi
+        if [ "$bad_resolution_count" -ne 0 ]; then
+            resolution_text="其中有${bad_resolution_count}个因采用的封面图宽高比不为1，生成的封面图非正方形"
+        fi
+        if [ "$bad_file_size_count" -ne 0 ] && [ "$bad_resolution_count" -ne 0 ]; then
+            separation_text="；"
+        fi
+        log_end "$operation_count" "$audio_count" "${size_text}${separation_text}${resolution_text}"
     fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob

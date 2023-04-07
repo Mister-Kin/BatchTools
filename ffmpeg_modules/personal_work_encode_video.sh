@@ -16,7 +16,7 @@ personal_work_encode_video() {
     mp4_count=$(file_count "mp4")
     flv_count=$(file_count "flv")
     mov_count=$(file_count "mov")
-    all_count=$(("$mp4_count" + "$flv_count" + "$mov_count"))
+    all_count=$((mp4_count + flv_count + mov_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "mp4" "flv" "mov"
         return 0
@@ -89,9 +89,9 @@ personal_work_encode_video() {
 
     draw_line_blank "-"
     if [ "$encode_audio_flag" = true ]; then
-        text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置压制音频的码率为「$audio_bitrate」，设置添加版权文字水印为「$watermark_flag」"
+        text_blank "当前已设置压制视频的crf值为「${video_crf}」，设置压制视频的最大码率为「${video_max_bitrate}」，设置压制视频的码率控制缓冲区大小为「${video_bufsize}」，设置压制视频的preset值为「${video_preset}」，设置重新编码音频为「${encode_audio_flag}」，设置压制音频的码率为「${audio_bitrate}」，设置添加版权文字水印为「${watermark_flag}」"
     else
-        text_blank "当前已设置压制视频的crf值为「$video_crf」，设置压制视频的最大码率为「$video_max_bitrate」，设置压制视频的码率控制缓冲区大小为「$video_bufsize」，设置压制视频的preset值为「$video_preset」，设置重新编码音频为「$encode_audio_flag」，设置添加版权文字水印为「$watermark_flag」"
+        text_blank "当前已设置压制视频的crf值为「${video_crf}」，设置压制视频的最大码率为「${video_max_bitrate}」，设置压制视频的码率控制缓冲区大小为「${video_bufsize}」，设置压制视频的preset值为「${video_preset}」，设置重新编码音频为「${encode_audio_flag}」，设置添加版权文字水印为「${watermark_flag}」"
     fi
 
     local watermark_effect filter_effect
@@ -110,13 +110,13 @@ personal_work_encode_video() {
     show_progress_bar "$all_count" "$operation_count"
     if [ "$encode_audio_flag" = true ]; then
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
-            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" "$output_path/$(get_file_name "$file").mp4"
+            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
     else
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
-            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "$output_path/$(get_file_name "$file").mp4"
+            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done

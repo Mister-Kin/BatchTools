@@ -16,7 +16,7 @@ audio_metadata_set_artist() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    all_count=$((m4a_count + mp3_count + flac_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "m4a" "mp3" "flac"
         return 0
@@ -65,11 +65,11 @@ audio_metadata_set_artist() {
         return 20
     fi
     draw_line_blank "~"
-    text_blank "当前已设置元数据标签-歌手名为「$audio_artist」"
+    text_blank "当前已设置元数据标签-歌手名为「${audio_artist}」"
 
     draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
-    ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_artist" "$output_path/$file"
+    ffmpeg_no_banner -i "$file" -c copy -map_chapters -1 -metadata title="$audio_artist" "${output_path}/${file}"
     ((operation_count++))
     show_progress_bar "1" "$operation_count"
     log_end "$operation_count" "$all_count"

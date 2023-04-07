@@ -62,6 +62,7 @@ merge_text_file_line_by_line() {
             select_txt2="${txt_file_array[$choice]}"
             paste -d "\n" "$select_txt1" "$select_txt2" >merged.txt
             ((operation_count++))
+            show_progress_bar "$txt_count" "$operation_count"
         fi
     fi
     log_end "$operation_count" "$txt_count"

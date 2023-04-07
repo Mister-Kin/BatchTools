@@ -16,7 +16,7 @@ audio_cover_delete() {
     m4a_count=$(file_count "m4a")
     mp3_count=$(file_count "mp3")
     flac_count=$(file_count "flac")
-    all_count=$(("$m4a_count" + "$mp3_count" + "$flac_count"))
+    all_count=$((m4a_count + mp3_count + flac_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "m4a" "mp3" "flac"
         return 0
@@ -33,19 +33,17 @@ audio_cover_delete() {
         media_stream_number=$(get_media_info "$file" "format=nb_streams")
         if [ "$media_stream_number" -eq 2 ]; then
             # -map 0 选择所有流；-map -0:v 选择音频（-0:v加负号是取消选择视频流，即反选）
-            ffmpeg_no_banner -i "$file" -map 0 -map -0:v -c copy "$output_path/$file"
+            ffmpeg_no_banner -i "$file" -map 0 -map -0:v -c copy "${output_path}/${file}"
             ((operation_count++))
         else
-            # draw_line_blank "~"
-            # text_blank "「$file」文件内部没有封面图，无需进行删除音频封面图操作"
             ((no_cover_count++))
         fi
-        show_progress_bar "$all_count" $(("$operation_count" + "$no_cover_count"))
+        show_progress_bar "$all_count" "$((operation_count + no_cover_count))"
     done
     if [ "$no_cover_count" -eq 0 ]; then
         log_end "$operation_count" "$all_count"
     else
-        log_end "$operation_count" "$all_count" "有$no_cover_count个音频文件内部没有封面图，无需进行删除音频封面图操作"
+        log_end "$operation_count" "$all_count" "有${no_cover_count}个音频文件内部没有封面图，无需进行删除音频封面图操作"
     fi
     log_result "option_false" "directory" "$output_path"
     shopt -u nullglob

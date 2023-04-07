@@ -18,7 +18,7 @@ personal_work_image_watermark() {
     jpg_count=$(file_count "jpg")
     jpeg_count=$(file_count "jpeg")
     gif_count=$(file_count "gif")
-    all_count=$(("$png_count" + "$jpg_count" + "$jpeg_count" + "$gif_count"))
+    all_count=$((png_count + jpg_count + jpeg_count + gif_count))
     if [ "$all_count" -eq 0 ]; then
         log_file_not_detected "png" "jpg" "jpeg" "gif"
         return 0
@@ -29,24 +29,24 @@ personal_work_image_watermark() {
     local operation_count=0
     shopt -s nullglob
     draw_line_blank "~"
-    show_progress_bar $(("$all_count" * 2)) "$operation_count"
+    show_progress_bar $((all_count * 2)) "$operation_count"
     for file in $(file_extension_for_loop "png"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path1/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "png")" -pix_fmt pal8 "$output_path2/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "png")" -pix_fmt pal8 "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
-        show_progress_bar $(("$all_count" * 2)) "$operation_count"
+        show_progress_bar $((all_count * 2)) "$operation_count"
     done
     for file in $(file_extension_for_loop "jpg" "jpeg"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path1/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path2/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
-        show_progress_bar $(("$all_count" * 2)) "$operation_count"
+        show_progress_bar $((all_count * 2)) "$operation_count"
     done
     for file in $(file_extension_for_loop "gif"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "$output_path1/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "gif")" "$output_path2/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "gif")" "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
-        show_progress_bar $(("$all_count" * 2)) "$operation_count"
+        show_progress_bar $((all_count * 2)) "$operation_count"
     done
     log_end "$operation_count" "$all_count"
     log_result "$feature_note"
