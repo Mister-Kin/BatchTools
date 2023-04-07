@@ -2,7 +2,7 @@
 
 audio_converter() {
     local -a menu_options_array
-    menu_options_array+=("wav格式转m4a格式")
+    menu_options_array+=("无损音频转m4a格式")
     menu_options_array+=("退出子菜单")
     while true; do
         clear
@@ -13,9 +13,9 @@ audio_converter() {
         arrow_select_option "${menu_options_array[@]}"
         local choice=$?
         case ${menu_options_array[$choice]} in
-        "wav格式转m4a格式")
+        "无损音频转m4a格式")
             while [ $? -ne 20 ]; do
-                audio_converter_wav2m4a
+                audio_converter_lossless2m4a
             done
             ;;
         "退出子菜单")

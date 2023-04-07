@@ -78,6 +78,7 @@ audio_cover_attach() {
                 if [ "${check_image_flag[1]}" = false ]; then
                     ((bad_resolution_count++))
                 fi
+                # 封面图的title和comment标签只有flac格式可显示
                 ffmpeg_no_banner -i "$file" -i "$image_file" -map 0 -map 1 -c copy -disposition:v:0 attached_pic -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -map_chapters -1 "${output_path}/${file}"
                 ((operation_count++))
                 if [ "${check_image_flag[0]}" = false ]; then
