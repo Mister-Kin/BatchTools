@@ -258,6 +258,7 @@ log_end() {
 
 log_result() {
     draw_line_blank "-"
+    text_blank "当前路径为「${PWD}」"
     local result_text
     if [ $# -eq 1 ]; then
         result_text="$1"
