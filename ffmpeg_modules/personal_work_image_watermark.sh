@@ -31,20 +31,20 @@ personal_work_image_watermark() {
     draw_line_blank "~"
     show_progress_bar $((all_count * 2)) "$operation_count"
     for file in $(file_extension_for_loop "png"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "png")" -pix_fmt pal8 "${output_path2}/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark "$file")" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "$file")" -pix_fmt pal8 "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
         show_progress_bar $((all_count * 2)) "$operation_count"
     done
     for file in $(file_extension_for_loop "jpg" "jpeg"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path2}/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark "$file")" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark "$file")" "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
         show_progress_bar $((all_count * 2)) "$operation_count"
     done
     for file in $(file_extension_for_loop "gif"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark)" "${output_path1}/$(get_file_name "$file").webp"
-        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "gif")" "${output_path2}/$(lowercase_file_name_extension "$file")"
+        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark "$file")" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "$file")" "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
         show_progress_bar $((all_count * 2)) "$operation_count"
     done

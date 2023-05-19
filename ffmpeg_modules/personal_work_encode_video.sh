@@ -94,28 +94,33 @@ personal_work_encode_video() {
         text_blank "当前已设置压制视频的crf值为「${video_crf}」，设置压制视频的最大码率为「${video_max_bitrate}」，设置压制视频的码率控制缓冲区大小为「${video_bufsize}」，设置压制视频的preset值为「${video_preset}」，设置重新编码音频为「${encode_audio_flag}」，设置添加版权文字水印为「${watermark_flag}」"
     fi
 
-    local watermark_effect filter_effect
-    watermark_effect=$(copyright_watermark)
-    if [ "$watermark_flag" = true ]; then
-        filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
-    elif [ "$watermark_flag" = false ]; then
-        filter_effect="format=yuv420p"
-    fi
-
     log_start
     make_directory "$output_path"
     local operation_count=0
+    local watermark_effect filter_effect
     shopt -s nullglob
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     if [ "$encode_audio_flag" = true ]; then
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
+            watermark_effect=$(copyright_watermark "$file")
+            if [ "$watermark_flag" = true ]; then
+                filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
+            elif [ "$watermark_flag" = false ]; then
+                filter_effect="format=yuv420p"
+            fi
             ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
     else
         for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
+            watermark_effect=$(copyright_watermark "$file")
+            if [ "$watermark_flag" = true ]; then
+                filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
+            elif [ "$watermark_flag" = false ]; then
+                filter_effect="format=yuv420p"
+            fi
             ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"

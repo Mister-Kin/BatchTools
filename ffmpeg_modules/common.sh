@@ -8,7 +8,13 @@ ffmpeg_no_banner() {
 copyright_watermark() {
     local copyright_text="© Mr. Kin"
     local font_path="C\:\/Windows\/fonts\/SourceSans3-Semibold.otf"
-    local watermark_effect="split [main][tmp]; [tmp] drawtext=text='${copyright_text}':fontfile='${font_path}':fontcolor=white:fontsize=50:bordercolor=black:borderw=1.5:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=50:y=50 [toplayer]; [main][toplayer] overlay"
+    local watermark_effect media_width
+    media_width=$(get_media_info "$1" "stream=width")
+    if [ "$media_width" -le 2880 ]; then
+        watermark_effect="split [main][tmp]; [tmp] drawtext=text='${copyright_text}':fontfile='${font_path}':fontcolor=white:fontsize=50:bordercolor=black:borderw=1.5:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=60:y=60 [toplayer]; [main][toplayer] overlay"
+    else
+        watermark_effect="split [main][tmp]; [tmp] drawtext=text='${copyright_text}':fontfile='${font_path}':fontcolor=white:fontsize=80:bordercolor=black:borderw=3:shadowcolor=black:shadowx=1.8:shadowy=1.8:x=120:y=120 [toplayer]; [main][toplayer] overlay"
+    fi
     printf "%s" "$watermark_effect"
 }
 
@@ -21,13 +27,14 @@ filter_for_compress() {
 }
 
 filter_for_compress_with_copyright() {
-    local effect_copyright
-    effect_copyright=$(copyright_watermark)
-    if [ "$1" = "png" ]; then
+    local effect_copyright extension
+    effect_copyright=$(copyright_watermark "$1")
+    extension=$(uppercase_to_lowercase "$(get_file_extension "$1")")
+    if [ "$extension" = "png" ]; then
         local compress_png
         compress_png=$(filter_for_compress "png")
         printf "%s" "${effect_copyright}, ${compress_png}"
-    elif [ "$1" = "gif" ]; then
+    elif [ "$extension" = "gif" ]; then
         local compress_gif
         compress_gif=$(filter_for_compress "gif")
         printf "%s" "${effect_copyright}, ${compress_gif}"

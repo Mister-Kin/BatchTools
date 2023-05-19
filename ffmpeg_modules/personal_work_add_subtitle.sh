@@ -178,8 +178,7 @@ personal_work_add_subtitle() {
     shopt -u nullglob
 
     local watermark_effect filter_effect
-    watermark_effect=$(copyright_watermark)
-
+    watermark_effect=$(copyright_watermark "$input_video")
     if [ "$watermark_flag" = false ]; then
         filter_effect="${filter_type}='${subtitle_file}', format=yuv420p"
     else

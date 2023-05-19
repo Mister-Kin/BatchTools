@@ -45,19 +45,24 @@ personal_work_sequence2video() {
     fi
 
     local process_result input_file image_sequence_flag
+    local image_files image_for_effect_detect
     if [ "$png_count" -ge 24 ]; then
         process_result=($(process_image_sequence "png" "$png_count"))
         image_sequence_flag=${process_result[0]}
         input_file=${process_result[1]}
+        image_files=(*.png)
     elif [ "$jpg_count" -ge 24 ]; then
         process_result=($(process_image_sequence "jpg" "$jpg_count"))
         image_sequence_flag=${process_result[0]}
         input_file=${process_result[1]}
+        image_files=(*.jpg)
     elif [ "$jpeg_count" -ge 24 ]; then
         process_result=($(process_image_sequence "jpeg" "$jpeg_count"))
         image_sequence_flag=${process_result[0]}
         input_file=${process_result[1]}
+        image_files=(*.jpeg)
     fi
+    image_for_effect_detect=${image_files[0]}
 
     if [ "$image_sequence_flag" = false ]; then
         return 0
@@ -123,7 +128,7 @@ personal_work_sequence2video() {
     text_blank "当前已设置压制视频的帧率为「${sequence_video_fps}」，设置压制视频的crf值为「${video_crf}」，设置压制视频的最大码率为「${video_max_bitrate}」，设置压制视频的码率控制缓冲区大小为「${video_bufsize}」，设置压制视频的preset值为「${video_preset}」，设置添加版权文字水印为「${watermark_flag}」"
 
     local watermark_effect filter_effect
-    watermark_effect=$(copyright_watermark)
+    watermark_effect=$(copyright_watermark "$image_for_effect_detect")
     if [ "$watermark_flag" = true ]; then
         filter_effect="${watermark_effect}[watermark_effect]; [watermark_effect] format=yuv420p"
     elif [ "$watermark_flag" = false ]; then
