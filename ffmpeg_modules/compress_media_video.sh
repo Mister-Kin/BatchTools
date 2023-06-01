@@ -4,7 +4,7 @@ compress_media_video() {
     local output_path="compress_media_video"
     local feature_name feature_intro feature_note
     feature_name="压缩视频，转换为hevc编码的mp4格式（libx265）"
-    feature_intro="将路径下的mp4文件或者flv文件或者mov文件或者avi文件转换hevc编码的mp4格式（libx265）$(description_append_intro "设置压制视频的crf值；设置压制视频的preset值；是否删除源文件")"
+    feature_intro="将路径下的mp4文件或者flv文件或者mov文件或者avi文件或者wmv文件转换hevc编码的mp4格式（libx265）$(description_append_intro "设置压制视频的crf值；设置压制视频的preset值；是否删除源文件")"
     feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
@@ -12,14 +12,15 @@ compress_media_video() {
         return 20
     fi
 
-    local all_count mp4_count flv_count mov_count avi_count
+    local all_count mp4_count flv_count mov_count avi_count wmv_count
     mp4_count=$(file_count "mp4")
     flv_count=$(file_count "flv")
     mov_count=$(file_count "mov")
     avi_count=$(file_count "avi")
-    all_count=$((mp4_count + flv_count + mov_count + avi_count))
+    wmv_count=$(file_count "wmv")
+    all_count=$((mp4_count + flv_count + mov_count + avi_count + wmv_count))
     if [ "$all_count" -eq 0 ]; then
-        log_file_not_detected "mp4" "flv" "mov" "avi"
+        log_file_not_detected "mp4" "flv" "mov" "avi" "wmv"
         return 0
     fi
 
@@ -54,8 +55,16 @@ compress_media_video() {
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done
+    # wmv转mp4，音频需要指定编码，不能copy
+    # Could not find tag for codec wmav2 in stream
+    # MP4 doesn't take Windows Media Audio in its container
+    for file in $(file_extension_for_loop "wmv"); do
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a libfdk_aac -b:a "192k" -x265-params log-level=error "${output_path}/$(get_file_name "$file").mp4"
+        ((operation_count++))
+        show_progress_bar "$all_count" "$operation_count"
+    done
     if [ "$delete_source_files" = true ]; then
-        for file in $(file_extension_for_loop "mp4" "flv" "mov" "avi"); do
+        for file in $(file_extension_for_loop "mp4" "flv" "mov" "avi" "wmv"); do
             rm -rf "$file"
             ((delete_count++))
         done
