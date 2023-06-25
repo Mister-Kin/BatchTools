@@ -50,10 +50,10 @@ Some batch scripts for easily doing work.
   - 给图片添加版权水印并压缩
   - 图片压缩：转 webp
   - 合并音视频：mp4 + m4a
-  - 视频转封装：flv -^> mp4
+  - 视频转封装：flv -> mp4
   - 视频压缩：转 hevc 编码（libx265）
-  - 显卡加速图片序列合成视频：普通录屏（jpg + wav -^> h264_nvenc + aac）
-  - 显卡加速图片序列合成视频：CG（png + wav -^> h264_nvenc + aac）
+  - 显卡加速图片序列合成视频：普通录屏（jpg + wav -> h264_nvenc + aac）
+  - 显卡加速图片序列合成视频：CG（png + wav -> h264_nvenc + aac）
 
 ## Usage
 [Jump to Documentation Page][]
