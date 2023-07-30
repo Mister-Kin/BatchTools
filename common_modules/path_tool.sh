@@ -31,7 +31,7 @@ change_directory() {
             return 10
         fi
     done
-    blank_text_blank_normal "工作路径已切换到「${path}」"
+    blank_text_blank_normal "工作路径已切换到「${PWD}」"
 }
 
 make_directory() {

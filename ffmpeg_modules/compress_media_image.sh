@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# TODO：输出压缩的大小。
 compress_media_image() {
     local feature_name feature_intro feature_note
     feature_name="压缩图片（原格式压缩或者转换为webp格式）"
