@@ -116,9 +116,9 @@ audio_cover_attach() {
             done
             if [ "$check_name_flag" = false ]; then
                 draw_line_blank "~"
-                size_text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
-                size_text_blank "当前路径下检测到多张封面图，但未检测到和「${file}」同名的封面图"
-                size_text_blank "现在进入手动选择封面图模式："
+                text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
+                text_blank "当前路径下检测到多张封面图，但未检测到和「${file}」同名的封面图"
+                text_blank "现在进入手动选择封面图模式："
                 # 文件名可能含有空格，通过函数返回数组处理文件名十分麻烦，需额外添加分隔符处理分割字符块再重新数组化，因此不采用分离模块函数实现
                 local -a image_file_array=()
                 if [ "$png_count" -ne 0 ]; then
