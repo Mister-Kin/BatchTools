@@ -5,7 +5,7 @@ image_converter_image2png() {
     local feature_name feature_intro feature_note
     feature_name="图片转png格式"
     feature_intro="将路径下的webp文件或者jpg文件或者jpeg文件或者gif文件或者tga文件转换成png格式$(description_append_intro "是否删除源文件")"
-    feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "image2png")"
+    feature_note="$(description_append_note "option_false" "directory" "directory_delete_option" "$output_path")"
     description "$feature_name" "$feature_intro" "$feature_note"
     change_directory
     if [ $? -eq 10 ]; then
