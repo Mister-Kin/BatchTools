@@ -2,7 +2,7 @@
 
 video_converter() {
     local -a menu_options_array
-    menu_options_array+=("flv格式转mp4格式")
+    menu_options_array+=("视频转mp4格式")
     menu_options_array+=("退出子菜单")
     while true; do
         clear
@@ -13,9 +13,9 @@ video_converter() {
         arrow_select_option "${menu_options_array[@]}"
         local choice=$?
         case ${menu_options_array[$choice]} in
-        "flv格式转mp4格式")
+        "视频转mp4格式")
             while [ $? -ne 20 ]; do
-                video_converter_flv2mp4
+                video_converter_video2mp4
             done
             ;;
         "退出子菜单")
