@@ -44,7 +44,7 @@ personal_work_image_watermark() {
         show_progress_bar $((all_count * 2)) "$operation_count"
     done
     for file in $(file_extension_for_loop "gif"); do
-        ffmpeg_no_banner -i "$file" -vf "$(copyright_watermark "$file")" "${output_path1}/$(get_file_name "$file").webp"
+        ffmpeg_no_banner -i "$file" -loop 0 -vf "$(copyright_watermark "$file")" "${output_path1}/$(get_file_name "$file").webp"
         ffmpeg_no_banner -i "$file" -vf "$(filter_for_compress_with_copyright "$file")" "${output_path2}/$(lowercase_file_name_extension "$file")"
         ((operation_count += 2))
         show_progress_bar $((all_count * 2)) "$operation_count"
