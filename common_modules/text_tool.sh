@@ -382,6 +382,9 @@ file_extension_for_loop() {
                 file_extension+=" *.$(uppercase_to_lowercase "$4") *.$(lowercase_to_uppercase "$4")"
                 if [ $# -ge 5 ]; then
                     file_extension+=" *.$(uppercase_to_lowercase "$5") *.$(lowercase_to_uppercase "$5")"
+                    if [ $# -ge 6 ]; then
+                        file_extension+=" *.$(uppercase_to_lowercase "$6") *.$(lowercase_to_uppercase "$6")"
+                    fi
                 fi
             fi
         fi
