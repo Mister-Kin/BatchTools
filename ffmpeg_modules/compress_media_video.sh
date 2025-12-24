@@ -52,7 +52,7 @@ compress_media_video() {
     draw_line_blank "~"
     show_progress_bar "$all_count" "$operation_count"
     for file in $(file_extension_for_loop "mp4" "flv" "mov" "avi" "mpg"); do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy -x265-params log-level=error "${output_path}/$(get_file_name "$file").mp4"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a copy -x265-params log-level=error:info=0 "${output_path}/$(get_file_name "$file").mp4"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done
@@ -60,7 +60,7 @@ compress_media_video() {
     # Could not find tag for codec wmav2 in stream
     # MP4 doesn't take Windows Media Audio in its container
     for file in $(file_extension_for_loop "wmv"); do
-        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a libfdk_aac -b:a "192k" -x265-params log-level=error "${output_path}/$(get_file_name "$file").mp4"
+        ffmpeg_no_banner -i "$file" -c:v libx265 -crf:v "$video_crf" -preset:v "$video_preset" -c:a libfdk_aac -b:a "192k" -x265-params log-level=error:info=0 "${output_path}/$(get_file_name "$file").mp4"
         ((operation_count++))
         show_progress_bar "$all_count" "$operation_count"
     done
