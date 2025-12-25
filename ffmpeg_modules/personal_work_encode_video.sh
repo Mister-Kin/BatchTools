@@ -109,7 +109,7 @@ personal_work_encode_video() {
             elif [ "$watermark_flag" = false ]; then
                 filter_effect="format=yuv420p"
             fi
-            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" "${output_path}/$(get_file_name "$file").mp4"
+            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a libfdk_aac -b:a "$audio_bitrate" -bsf:v filter_units=remove_types=6 "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done
@@ -121,7 +121,7 @@ personal_work_encode_video() {
             elif [ "$watermark_flag" = false ]; then
                 filter_effect="format=yuv420p"
             fi
-            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "${output_path}/$(get_file_name "$file").mp4"
+            ffmpeg_no_banner -i "$file" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy -bsf:v filter_units=remove_types=6 "${output_path}/$(get_file_name "$file").mp4"
             ((operation_count++))
             show_progress_bar "$all_count" "$operation_count"
         done

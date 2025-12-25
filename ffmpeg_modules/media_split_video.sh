@@ -296,10 +296,10 @@ media_split_video() {
 
         if [ "$accurate_clip_time" = true ]; then
             if [ "$encode_audio_flag" = false ]; then
-                ffmpeg_no_banner -i "$input_video" -ss "$clip_start_time" -to "$clip_end_time" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "format=yuv420p" -c:a copy "${output_path}/${clip_start_time_text} - ${clip_end_time_text}.${input_video_extension}"
+                ffmpeg_no_banner -i "$input_video" -ss "$clip_start_time" -to "$clip_end_time" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "format=yuv420p" -c:a copy -bsf:v filter_units=remove_types=6 "${output_path}/${clip_start_time_text} - ${clip_end_time_text}.${input_video_extension}"
                 ((operation_count++))
             else
-                ffmpeg_no_banner -i "$input_video" -ss "$clip_start_time" -to "$clip_end_time" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "format=yuv420p" -c:a libfdk_aac -b:a "$audio_bitrate" "${output_path}/${clip_start_time_text} - ${clip_end_time_text}.${input_video_extension}"
+                ffmpeg_no_banner -i "$input_video" -ss "$clip_start_time" -to "$clip_end_time" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "format=yuv420p" -c:a libfdk_aac -b:a "$audio_bitrate" -bsf:v filter_units=remove_types=6 "${output_path}/${clip_start_time_text} - ${clip_end_time_text}.${input_video_extension}"
                 ((operation_count++))
             fi
         else

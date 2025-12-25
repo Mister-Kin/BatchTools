@@ -190,7 +190,7 @@ personal_work_add_subtitle() {
     local operation_count=0
     draw_line_blank "~"
     show_progress_bar "1" "$operation_count"
-    ffmpeg_no_banner -i "$input_video" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy "${output_path}/$(lowercase_file_name_extension "$input_video")"
+    ffmpeg_no_banner -i "$input_video" -c:v libx264 -crf:v "$video_crf" -preset:v "$video_preset" -maxrate:v "$video_max_bitrate" -bufsize:v "$video_bufsize" -vf "$filter_effect" -c:a copy -bsf:v filter_units=remove_types=6 "${output_path}/$(lowercase_file_name_extension "$input_video")"
     ((operation_count++))
     show_progress_bar "1" "$operation_count"
     log_end "$operation_count" "$video_count"
