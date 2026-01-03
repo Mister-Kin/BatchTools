@@ -85,23 +85,24 @@ media_split_video() {
     mp4_count=$(file_count "mp4")
     flv_count=$(file_count "flv")
     mov_count=$(file_count "mov")
-    all_count=$((mp4_count + flv_count + mov_count))
+    wmv_count=$(file_count "wmv")
+    all_count=$((mp4_count + flv_count + mov_count + wmv_count))
     if [ "$all_count" -eq 0 ]; then
-        log_file_not_detected "mp4" "flv" "mov"
+        log_file_not_detected "mp4" "flv" "mov" "wmv"
         return 0
     fi
 
     shopt -s nullglob
     local input_video input_video_extension
     if [ "$all_count" -eq 1 ]; then
-        for file in $(file_extension_for_loop "mp4" "flv" "mov"); do
+        for file in $(file_extension_for_loop "mp4" "flv" "mov" "wmv"); do
             input_video="$file"
         done
     else
         draw_line_blank "-"
         text_blank "提示：使用上下方向键↑↓选择文件，回车键Enter确认选项"
         text_blank "当前路径下检测到多个视频文件"
-        text_blank "现在进入手动选择视频模式，请选择需要添加字幕的视频："
+        text_blank "现在进入手动选择视频模式，请选择需要分割的视频："
         local -a video_file_array=()
         if [ "$mp4_count" -ne 0 ]; then
             video_file_array+=(*.mp4)
@@ -114,6 +115,10 @@ media_split_video() {
         if [ "$mov_count" -ne 0 ]; then
             video_file_array+=(*.mov)
             video_file_array+=(*.MOV)
+        fi
+        if [ "$wmv_count" -ne 0 ]; then
+            video_file_array+=(*.wmv)
+            video_file_array+=(*.WMV)
         fi
         video_file_array+=("取消功能操作，返回菜单")
         arrow_select_option "${video_file_array[@]}"
